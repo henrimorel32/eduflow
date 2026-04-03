@@ -1,0 +1,166 @@
+<?php
+ob_clean();
+header('Content-Type: application/json');
+// 🔌 Chargement du service mail
+require_once __DIR__ . '/../components/Mailer.php';
+
+// 🧠 Variables de contrôle
+$errores = [];
+$exito = false;
+
+// 📩 Vérifie qu’on est bien sur un POST du formulaire
+if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+
+    // --------------------------------------------------
+    // 🧹 1. Récupération + nettoyage des données
+    // --------------------------------------------------
+    $nombre  = trim($_POST['nombre'] ?? '');
+    $email   = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
+    $colegio = trim($_POST['colegio'] ?? '');
+    $mensaje = trim($_POST['mensaje'] ?? '');
+    $escuela  = trim($_POST['escuela'] ?? '');
+    $ubicacion = trim($_POST['ubicacion'] ?? '');
+    $sistemas = trim($_POST['sistemas'] ?? '');
+    $problema = trim($_POST['problema'] ?? '');
+
+    // --------------------------------------------------
+    // ✅ 2. Validation des champs
+    // --------------------------------------------------
+    if (empty($nombre)) {
+        $errores[] = "El nombre es obligatorio";
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errores[] = "Email inválido";
+    }
+    if (empty($mensaje) && !empty($sistemas)) {
+        $mensaje = $sistemas;
+    }
+    if (empty($mensaje)) {
+        $errores[] = "El mensaje es obligatorio";
+    }
+
+    // --------------------------------------------------
+    // 🚀 3. Envoi des emails si tout est OK
+    // --------------------------------------------------
+    if (empty($errores)) {
+
+        // ==============================
+        // 📧 Email interne (pour toi)
+        // ==============================
+        $subject_admin = "📩 Nuevo contacto desde la web";
+
+        $body_admin = "
+        <div style='font-family: Arial, sans-serif; padding:20px;'>
+            <h2>Nuevo mensaje recibido</h2>
+            <hr>
+
+            <p><strong>Nombre:</strong> {$nombre}</p>
+            <p><strong>Email:</strong> {$email}</p>
+            <p><strong>Colegio:</strong> " . ($colegio ?: 'No especificado') . "</p>
+
+            <h3>Mensaje:</h3>
+            <p style='background:#f5f5f5; padding:10px; border-radius:5px;'>
+                " . nl2br(htmlspecialchars($mensaje)) . "
+            </p>
+        </div>
+        <p><strong>Escuela:</strong> {$escuela}</p>
+        <p><strong>Ubicación:</strong> {$ubicacion}</p>
+        <p><strong>Sistemas actuales:</strong><br>{$sistemas}</p>
+        <p><strong>Problema principal:</strong> {$problema}</p>
+        ";
+
+        $result_admin = Mailer::envoyer([
+            'to' => 'penelope@henrimorel.com',
+            'subject' => $subject_admin,
+            'body' => $body_admin
+        ]);
+
+        // ==============================
+        // 📧 Email utilisateur (confirmation)
+        // ==============================
+        $subject_user = "✨ Hemos recibido tu mensaje";
+
+        $body_user = "
+        <div style='font-family: Arial, sans-serif; background:#f5f7fa; padding:20px;'>
+            
+            <div style='max-width:600px; margin:auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.08);'>
+                
+                <!-- Header -->
+                <div style='background: linear-gradient(135deg,#4f46e5,#06b6d4); color:white; padding:25px; text-align:center;'>
+                    <h2 style='margin:0;'>¡Mensaje recibido! 🚀</h2>
+                    <p style='margin:5px 0 0;'>Equipo de Inscripciones Digitales</p>
+                </div>
+
+                <!-- Content -->
+                <div style='padding:25px; color:#333;'>
+
+                    <p style='font-size:16px;'>Hola <strong>{$nombre}</strong>,</p>
+
+                    <p>
+                        Gracias por contactarnos 🙌<br>
+                        Hemos recibido tu mensaje correctamente y nuestro equipo ya está revisándolo.
+                    </p>
+
+                    <div style='margin:20px 0; padding:15px; background:#f9fafb; border-radius:8px;'>
+                        <p style='margin:0; font-size:14px; color:#555;'>
+                            ⏱️ Tiempo de respuesta estimado: <strong>menos de 24 horas</strong>
+                        </p>
+                    </div>
+
+                    <p>
+                        Te ayudaremos a digitalizar el proceso de inscripción y mejorar la gestión de tu escuela.
+                    </p>
+
+                    <hr style='margin:25px 0;'>
+
+                    <!-- CTA -->
+                    <div style='text-align:center; margin:25px 0;'>
+                        <a href='https://wa.me/573204181193' 
+                           style='background:#25D366; color:white; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block;'>
+                            💬 Hablar por WhatsApp
+                        </a>
+                    </div>
+
+                    <p style='font-size:13px; color:#888; text-align:center;'>
+                        También puedes responder directamente a este correo.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+        ";
+
+        $result_user = Mailer::envoyer([
+            'to' => $email,
+            'subject' => $subject_user,
+            'body' => $body_user
+        ]);
+
+        // --------------------------------------------------
+        // 🎯 4. Gestion du résultat global
+        // --------------------------------------------------
+        if ($result_admin === true && $result_user === true) {
+            $exito = true;
+        } else {
+            $errores[] = "Error al enviar el mensaje";
+        }
+    }
+}
+
+// --------------------------------------------------
+// 📤 5. Retour JSON (si appel AJAX) OU variable PHP
+// --------------------------------------------------
+
+// 👉 Si tu veux l’utiliser en AJAX
+ob_end_clean();
+echo json_encode([
+    'exito' => $exito,
+    'errores' => $errores
+]);
+exit;
+
+// 👉 Sinon $exito reste dispo pour ta vue PHP
+?>

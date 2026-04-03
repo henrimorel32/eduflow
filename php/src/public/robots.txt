@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Interdire l'accès aux dossiers système
+Disallow: /assets/js/
+Disallow: /includes/
+Disallow: /pages/
+Disallow: /procesar_contacto.php
+
+# Sitemap
+Sitemap: https://tondomaine.com/sitemap.xml
+
+# Crawl-delay optionnel (si serveur léger)
+Crawl-delay: 1
