@@ -1,0 +1,167 @@
+# ============================================================
+# DOCKER COMPOSE PRODUCTION - INFRASTRUCTURE COMPLÈTE
+# ============================================================
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+# 
+# Ce fichier déploie:
+# - Traefik (reverse proxy + SSL)
+# - PostgreSQL (BDD commune)
+# - Redis (cache)
+# - App principale PHP
+# - Nginx (static files)
+#
+# Pour ajouter une école, utiliser le script:
+#   ./infra/scripts/deploy-school.sh
+# ============================================================
+
+version: '3.8'
+
+services:
+  # ============================================================
+  # TRAEFIK - Reverse Proxy & SSL
+  # ============================================================
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=proxy"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=henri@henrimorel.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=INFO"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./infra/letsencrypt:/letsencrypt
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.henrimorel.com`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+
+  # ============================================================
+  # POSTGRESQL - Base de données commune
+  # ============================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: edu_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: edu_platform
+      POSTGRES_USER: edu_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - edu_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edu_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================
+  # REDIS - Cache et sessions
+  # ============================================================
+  redis:
+    image: redis:7-alpine
+    container_name: edu_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - edu_internal
+
+  # ============================================================
+  # APPLICATION PRINCIPALE - PHP-FPM
+  # ============================================================
+  php:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: edu_php
+    restart: unless-stopped
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=edu_platform
+      - DB_USER=edu_admin
+      - DB_PASS=${POSTGRES_PASSWORD}
+      - REDIS_HOST=redis
+      - APP_ENV=production
+      # OVH S3
+      - OVH_S3_ENDPOINT=${OVH_S3_ENDPOINT}
+      - OVH_S3_ACCESS_KEY=${OVH_S3_ACCESS_KEY}
+      - OVH_S3_SECRET_KEY=${OVH_S3_SECRET_KEY}
+      - OVH_S3_BUCKET=${OVH_S3_BUCKET}
+      - OVH_S3_REGION=${OVH_S3_REGION}
+      # Email
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+    volumes:
+      - ./php/src:/var/www/html
+      - schools_data:/var/schools
+    networks:
+      - edu_internal
+    depends_on:
+      - postgres
+
+  # ============================================================
+  # NGINX - Serveur Web
+  # ============================================================
+  nginx:
+    image: nginx:alpine
+    container_name: edu_nginx
+    restart: unless-stopped
+    volumes:
+      - ./php/src:/var/www/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./logs/nginx:/var/log/nginx
+    networks:
+      - edu_internal
+      - proxy
+    depends_on:
+      - php
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.edu-nginx.rule=Host(`henrimorel.com`) || Host(`www.henrimorel.com`)"
+      - "traefik.http.routers.edu-nginx.entrypoints=websecure"
+      - "traefik.http.routers.edu-nginx.tls.certresolver=letsencrypt"
+      - "traefik.http.services.edu-nginx.loadbalancer.server.port=80"
+
+  # ============================================================
+  # ADMINER - Gestion BDD (localhost uniquement)
+  # ============================================================
+  adminer:
+    image: adminer:latest
+    container_name: edu_adminer
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8082:8080"
+    networks:
+      - edu_internal
+
+volumes:
+  postgres_data:
+  redis_data:
+  schools_data:
+
+networks:
+  proxy:
+    external: true
+  edu_internal:
+    driver: bridge

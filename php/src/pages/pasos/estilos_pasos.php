@@ -454,3 +454,153 @@
         justify-content: center;
     }
 }
+
+/* ============================================
+   BOUTON SOUSCRIPTION ÉCOLE
+   ============================================ */
+
+.suscripcion-box {
+    margin: 32px 0;
+}
+
+.suscripcion-divider {
+    position: relative;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.suscripcion-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+.suscripcion-divider span {
+    position: relative;
+    background: rgba(15, 23, 42, 0.9);
+    padding: 0 16px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-suscripcion {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+    border: 2px solid rgba(251, 191, 36, 0.4);
+    border-radius: 16px;
+    padding: 20px 28px;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-suscripcion::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-suscripcion:hover::before {
+    left: 100%;
+}
+
+.btn-suscripcion:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(245, 158, 11, 0.4);
+    border-color: rgba(251, 191, 36, 0.6);
+}
+
+.suscripcion-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.suscripcion-text {
+    flex: 1;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.suscripcion-main {
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.suscripcion-sub {
+    font-size: 0.9rem;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+.suscripcion-arrow {
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-suscripcion:hover .suscripcion-arrow {
+    transform: translateX(6px);
+}
+
+/* Animation pulse pour attirer l'attention */
+.btn-suscripcion {
+    animation: suscripcionPulse 2s ease-in-out infinite;
+}
+
+@keyframes suscripcionPulse {
+    0%, 100% { 
+        box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3);
+    }
+    50% { 
+        box-shadow: 0 8px 40px rgba(245, 158, 11, 0.5);
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .btn-suscripcion {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+        padding: 20px;
+    }
+    
+    .suscripcion-text {
+        text-align: center;
+    }
+    
+    .suscripcion-icon {
+        font-size: 2rem;
+    }
+    
+    .suscripcion-main {
+        font-size: 1.1rem;
+    }
+    
+    .suscripcion-arrow {
+        display: none;
+    }
+}

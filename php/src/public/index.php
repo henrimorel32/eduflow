@@ -45,14 +45,16 @@ elseif (!empty($_SERVER['REQUEST_URI'])) {
 $page = preg_replace('/[^a-z0-9_-]/i', '', $page); // Nettoyage
 $page = $page ?: 'home';
 
-$allowed = ['home', 'soluciones', 'contacto', 'icfes','procesar_contacto','inscripcion'];
+$allowed = ['home', 'soluciones', 'contacto', 'icfes','procesar_contacto','inscripcion','suscripcion','check_nombre','check_disponibilidad'];
 if (!in_array($page, $allowed, true)) {
     $page = 'home';
 }
 
-//page de process à ne pas router
-if ($page === 'procesar_contacto') {
-    require PAGES_PATH . '/procesar_contacto.php';
+// Pages API / endpoints (pas de header/footer)
+$apiPages = ['procesar_contacto', 'check_nombre', 'check_disponibilidad'];
+if (in_array($page, $apiPages, true)) {
+    require_once INCLUDES_PATH . '/config.php';
+    require PAGES_PATH . '/' . $page . '.php';
     exit;
 }
 // =====================================================

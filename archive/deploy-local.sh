@@ -10,9 +10,9 @@
 set -e
 
 # Configuration
-VPS_USER="ubuntu"                    # Utilisateur SSH (passer en paramètre ou défaut root)
+VPS_USER="henri"                    # Utilisateur SSH (passer en paramètre ou défaut root)
 VPS_HOST="51.178.136.181"           # Hostname ou IP du VPS
-VPS_DIR="/opt/eduflow"                   # Répertoire distant
+VPS_DIR="/opt/docker/apps/eduflow"                   # Répertoire distant
 LOCAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"  # Répertoire local du projet
 
 # Couleurs

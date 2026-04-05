@@ -1,0 +1,30 @@
+# ============================================================
+# OVERRIDE POUR DÉVELOPPEMENT LOCAL
+# ============================================================
+# Ce fichier surcharge docker-compose.yml pour le développement local
+# En prod, ce fichier n'est PAS utilisé (juste docker-compose.yml)
+#
+# Usage local:
+#   docker-compose up -d
+#   Accès: http://localhost:8080
+#
+# Usage prod (sans ce fichier):
+#   docker-compose -f docker-compose.yml up -d
+# ============================================================
+
+services:
+  nginx:
+    # En local, on expose directement le port
+    ports:
+      - "8080:80"
+    # Retirer les labels Traefik en local
+    labels: []
+    networks:
+      # Seulement le réseau interne en local
+      - edu_network
+
+# En local, on n'a pas besoin du réseau external
+# On le redéfinit comme un réseau normal
+networks:
+  edu_proxy:
+    driver: bridge

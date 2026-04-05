@@ -1,0 +1,43 @@
+# ============================================================
+# Traefik Reverse Proxy (PRODUCTION uniquement)
+# ============================================================
+# Ce fichier démarre Traefik qui gère :
+# - Le routage des domaines
+# - Le SSL/TLS automatique (Let's Encrypt)
+# - La redirection HTTP → HTTPS
+#
+# Usage: docker-compose -f docker-compose.traefik.yml up -d
+# ============================================================
+
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=henri@henrimorel.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=INFO"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.henrimorel.com`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+
+networks:
+  proxy:
+    external: true

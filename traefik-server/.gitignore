@@ -1,0 +1,25 @@
+# Secrets
+.env
+.env.local
+
+# Certificats SSL (sensibles)
+letsencrypt/acme.json
+letsencrypt/*.json
+
+# Logs
+*.log
+logs/
+
+# Backups
+*.backup
+*.backup*
+*.old
+
+# Fichiers générés par les écoles
+dynamic/*.yml
+!dynamic/middlewares.yml
+!dynamic/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db

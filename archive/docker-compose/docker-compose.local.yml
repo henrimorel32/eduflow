@@ -1,10 +1,29 @@
+# ============================================================
+# Docker Compose pour DEVELOPPEMENT LOCAL
+# Usage: docker-compose -f docker-compose.local.yml up -d
+# ============================================================
+# Ce fichier est utilisé en LOCAL uniquement (pas de Traefik)
+# En production, utilisez: docker-compose.yml (avec Traefik)
+# ============================================================
+
+# ============================================================
+# Docker Compose pour DEVELOPPEMENT LOCAL
+# ============================================================
+# Usage: docker-compose -f docker-compose.local.yml up -d
+# 
+# Ce fichier utilise automatiquement .env.local (pas .env)
+# Pour forcer l'utilisation de .env.local explicitement:
+#   docker-compose -f docker-compose.local.yml --env-file .env.local up -d
+# ============================================================
+
 services:
-  # Nginx - exposé via Traefik uniquement (PRODUCTION)
+  # Nginx - exposé sur port 8081 (localhost uniquement)
   nginx:
     image: nginx:alpine
     container_name: edu_nginx
     restart: unless-stopped
-    # PAS de ports exposés ici - Traefik gère l'accès
+    ports:
+      - "127.0.0.1:8081:80"  # Localhost uniquement pour sécurité
     volumes:
       - ./php/src:/var/www/html:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -14,21 +33,9 @@ services:
       - php
     networks:
       - edu_network
-      - edu_proxy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=edu_proxy"
-      - "traefik.http.routers.edu-nginx.rule=Host(`henrimorel.com`) || Host(`www.henrimorel.com`)"
-      - "traefik.http.routers.edu-nginx.entrypoints=web"
-      - "traefik.http.routers.edu-nginx.middlewares=edu-redirect"
-      - "traefik.http.routers.edu-nginx-secure.rule=Host(`henrimorel.com`) || Host(`www.henrimorel.com`)"
-      - "traefik.http.routers.edu-nginx-secure.entrypoints=websecure"
-      - "traefik.http.routers.edu-nginx-secure.tls=true"
-      - "traefik.http.routers.edu-nginx-secure.tls.certresolver=letsencrypt"
-      - "traefik.http.middlewares.edu-redirect.redirectscheme.scheme=https"
-      - "traefik.http.services.edu-nginx.loadbalancer.server.port=80"
+    # PAS de labels Traefik en local
 
-  # PHP-FPM - interne uniquement
+  # PHP-FPM
   php:
     build:
       context: ./php
@@ -47,7 +54,7 @@ services:
     networks:
       - edu_network
 
-  # MySQL - localhost uniquement
+  # MySQL
   mysql:
     image: mysql:8.0
     container_name: edu_mysql
@@ -62,7 +69,7 @@ services:
     networks:
       - edu_network
 
-  # phpMyAdmin - UNIQUEMENT localhost (pas Traefik)
+  # phpMyAdmin
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: edu_phpmyadmin
@@ -71,12 +78,11 @@ services:
       PMA_HOST: mysql
       PMA_PORT: 3306
     ports:
-      - "127.0.0.1:8080:80"    # ← Localhost uniquement, PAS de Traefik
+      - "127.0.0.1:8080:80"
     depends_on:
       - mysql
     networks:
       - edu_network
-    # PAS de labels Traefik = PAS exposé sur internet
 
 volumes:
   mysql_data:
@@ -84,5 +90,3 @@ volumes:
 networks:
   edu_network:
     driver: bridge
-  edu_proxy:
-    external: true

@@ -1,0 +1,136 @@
+# ============================================================
+# Docker Compose Template pour une école
+# Ce fichier est généré automatiquement par le système de souscription
+# ============================================================
+# 
+# Instructions de déploiement:
+# 1. Copier ce fichier dans /var/schools/{SCHOOL_SLUG}/docker-compose.yml
+# 2. Copier le fichier .env généré dans le même répertoire
+# 3. Exécuter: docker-compose up -d
+#
+# Accès après déploiement:
+# - Site web: https://{SCHOOL_SLUG}.henrimorel.com
+# - phpMyAdmin: http://localhost:{PHPMYADMIN_PORT}
+#
+# ============================================================
+
+version: '3.8'
+
+services:
+  # ============================================
+  # Nginx - Serveur web
+  # ============================================
+  nginx_{SCHOOL_SLUG}:
+    image: nginx:alpine
+    container_name: edu_nginx_{SCHOOL_SLUG}
+    restart: unless-stopped
+    volumes:
+      - ./php/src:/var/www/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - php_{SCHOOL_SLUG}
+    networks:
+      - edu_network_{SCHOOL_SLUG}
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.edu-{SCHOOL_SLUG}.rule=Host(`{SCHOOL_SLUG}.henrimorel.com`)"
+      - "traefik.http.routers.edu-{SCHOOL_SLUG}.entrypoints=web"
+      - "traefik.http.routers.edu-{SCHOOL_SLUG}.middlewares=edu-{SCHOOL_SLUG}-redirect"
+      - "traefik.http.routers.edu-{SCHOOL_SLUG}-secure.rule=Host(`{SCHOOL_SLUG}.henrimorel.com`)"
+      - "traefik.http.routers.edu-{SCHOOL_SLUG}-secure.entrypoints=websecure"
+      - "traefik.http.routers.edu-{SCHOOL_SLUG}-secure.tls=true"
+      - "traefik.http.routers.edu-{SCHOOL_SLUG}-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.middlewares.edu-{SCHOOL_SLUG}-redirect.redirectscheme.scheme=https"
+      - "traefik.http.services.edu-{SCHOOL_SLUG}.loadbalancer.server.port=80"
+
+  # ============================================
+  # PHP-FPM - Application PHP
+  # ============================================
+  php_{SCHOOL_SLUG}:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: edu_php_{SCHOOL_SLUG}
+    restart: unless-stopped
+    volumes:
+      - ./php/src:/var/www/html
+      - ./php/school-config/{SCHOOL_SLUG}:/var/www/html/config:ro
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=mysql_{SCHOOL_SLUG}
+      - DB_PORT=3306
+      - DB_NAME={DB_NAME}
+      - DB_USER={DB_USER}
+      - DB_PASS={DB_PASSWORD}
+      # Configuration personnalisée de l'école
+      - SCHOOL_NAME={SCHOOL_NAME}
+      - SCHOOL_SLUG={SCHOOL_SLUG}
+      - SCHOOL_COLOR_PRIMARY={SCHOOL_COLOR_PRIMARY}
+      - SCHOOL_COLOR_SECONDARY={SCHOOL_COLOR_SECONDARY}
+      - SCHOOL_LOGO_URL={SCHOOL_LOGO_URL}
+      - TRIAL_END_DATE={TRIAL_END_DATE}
+      - TRIAL_ACTIVE=true
+    depends_on:
+      - mysql_{SCHOOL_SLUG}
+    networks:
+      - edu_network_{SCHOOL_SLUG}
+
+  # ============================================
+  # MySQL - Base de données dédiée
+  # ============================================
+  mysql_{SCHOOL_SLUG}:
+    image: mysql:8.0
+    container_name: edu_mysql_{SCHOOL_SLUG}
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD={DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE={DB_NAME}
+      - MYSQL_USER={DB_USER}
+      - MYSQL_PASSWORD={DB_PASSWORD}
+    volumes:
+      - mysql_data_{SCHOOL_SLUG}:/var/lib/mysql
+      - ./mysql/init_school.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - edu_network_{SCHOOL_SLUG}
+    # Sécurité: MySQL n'est pas exposé publiquement
+    # Accès uniquement via le réseau interne
+
+  # ============================================
+  # phpMyAdmin (optionnel - localhost uniquement)
+  # ============================================
+  phpmyadmin_{SCHOOL_SLUG}:
+    image: phpmyadmin/phpmyadmin
+    container_name: edu_phpmyadmin_{SCHOOL_SLUG}
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql_{SCHOOL_SLUG}
+      PMA_PORT: 3306
+      PMA_ABSOLUTE_URI: https://{SCHOOL_SLUG}.henrimorel.com/phpmyadmin/
+    ports:
+      - "127.0.0.1:{PHPMYADMIN_PORT}:80"
+    depends_on:
+      - mysql_{SCHOOL_SLUG}
+    networks:
+      - edu_network_{SCHOOL_SLUG}
+    # PAS de labels Traefik = PAS exposé publiquement
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  mysql_data_{SCHOOL_SLUG}:
+    driver: local
+
+# ============================================
+# Réseaux
+# ============================================
+networks:
+  edu_network_{SCHOOL_SLUG}:
+    driver: bridge
+  proxy:
+    external: true

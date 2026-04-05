@@ -1,0 +1,41 @@
+# ============================================================
+# TEMPLATE ÉCOLE - À copier pour chaque nouvelle école
+# ============================================================
+# Usage:
+#   ./scripts/add-school-remote.sh <slug> <domain> <name>
+# ============================================================
+
+services:
+  school_{SCHOOL_SLUG}:
+    image: node:20-alpine
+    container_name: school_{SCHOOL_SLUG}
+    restart: unless-stopped
+    working_dir: /app
+    # Important: -H 0.0.0.0 pour écouter sur toutes les interfaces
+    command: sh -c "npm install && npm run build && npx next start -H 0.0.0.0"
+    environment:
+      - SCHOOL_SLUG={SCHOOL_SLUG}
+      - SCHOOL_NAME={SCHOOL_NAME}
+      - SCHOOL_DOMAIN={SCHOOL_DOMAIN}
+      - DATABASE_URL=postgresql://edu_admin:{POSTGRES_PASSWORD}@postgres:5432/edu_platform
+      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      # Important: pas de :ro (lecture seule) car npm install a besoin d'écrire
+      - /opt/docker/apps/eduflow/nextjs-template:/app
+    networks:
+      - eduflow_edu_internal
+      - edu_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.school-{SCHOOL_SLUG}.rule=Host(`{SCHOOL_DOMAIN}`) || Host(`www.{SCHOOL_DOMAIN}`)"
+      - "traefik.http.routers.school-{SCHOOL_SLUG}.entrypoints=websecure"
+      - "traefik.http.routers.school-{SCHOOL_SLUG}.tls.certresolver=letsencrypt"
+      - "traefik.http.services.school-{SCHOOL_SLUG}.loadbalancer.server.port=3000"
+
+networks:
+  eduflow_edu_internal:
+    external: true
+  edu_proxy:
+    external: true

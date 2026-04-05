@@ -383,7 +383,11 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                     </a>
 
                      <a href="<?= url('inscripcion') ?>" class="<?= isActive('inscripcion') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
-                        Modulo Inscripción
+                        Demo Inscripción
+                    </a>
+                    
+                    <a href="<?= url('suscripcion') ?>" class="<?= isActive('suscripcion') ?> px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 transition-all font-semibold shadow-lg">
+                        🎓 Suscribir Colegio
                     </a>
                     
                     <a href="<?= url('icfes') ?>" class="<?= isActive('icfes') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2">
@@ -466,6 +470,17 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                         <span class="text-xs text-gray-500">IA adaptativa</span>
                     </div>
                     <span class="ml-auto px-2 py-1 bg-secondary-500 text-white text-xs rounded-full font-bold">NUEVO</span>
+                </a>
+                
+                <a href="<?= url('suscripcion') ?>" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 text-gray-700 hover:text-orange-700 transition-all group border-2 border-yellow-400">
+                    <div class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center shadow-lg">
+                        <span class="text-xl">🎓</span>
+                    </div>
+                    <div>
+                        <span class="font-semibold block">Suscribir Colegio</span>
+                        <span class="text-xs text-gray-500">Crea tu página de inscripción</span>
+                    </div>
+                    <span class="ml-auto px-2 py-1 bg-orange-500 text-white text-xs rounded-full font-bold">GRATIS</span>
                 </a>
                 
                 <!-- Contact info mobile -->

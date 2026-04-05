@@ -1,0 +1,83 @@
+# Configuration Traefik pour serveur de production
+# Compatible: Traefik v2.10+
+
+api:
+  dashboard: true
+  insecure: false  # Désactivé en prod - utiliser middleware auth
+
+ping:
+  entryPoint: "traefik"
+
+log:
+  level: INFO
+  format: json
+
+accessLog:
+  format: json
+
+providers:
+  # Provider File pour les configs statiques (schools)
+  file:
+    directory: /dynamic
+    watch: true
+  
+  # Provider Docker (optionnel - si on utilise les labels)
+  docker:
+    exposedByDefault: false
+    network: edu_proxy
+    watch: true
+
+entryPoints:
+  web:
+    address: ':80'
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  
+  websecure:
+    address: ':443'
+    http:
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - security-headers@file
+  
+  traefik:
+    address: ':8080'
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: ${CF_API_EMAIL:-henri@henrimorel.com}
+      storage: /letsencrypt/acme.json
+      keyType: RSA4096
+      dnsChallenge:
+        provider: cloudflare
+        delayBeforeCheck: 10
+        resolvers:
+          - "1.1.1.1:53"
+          - "8.8.8.8:53"
+  
+  # Resolver de secours (staging) pour les tests
+  letsencrypt-staging:
+    acme:
+      email: ${CF_API_EMAIL:-henri@henrimorel.com}
+      storage: /letsencrypt/acme-staging.json
+      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      dnsChallenge:
+        provider: cloudflare
+        delayBeforeCheck: 10
+
+# TLS Options par défaut
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+      cipherSuites:
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+      sniStrict: true

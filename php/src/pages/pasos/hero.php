@@ -89,6 +89,21 @@
             <p class="form-hint"><?= t('hero_email_hint', 'hero') ?></p>
         </form>
 
+        <!-- BOUTON SOUSCRIPTION ÉCOLE -->
+        <div class="suscripcion-box">
+            <div class="suscripcion-divider">
+                <span>o</span>
+            </div>
+            <a href="/suscripcion?lang=<?= $idioma_actual ?>" class="btn-suscripcion">
+                <span class="suscripcion-icon">🎓</span>
+                <span class="suscripcion-text">
+                    <span class="suscripcion-main"><?= t('btn_suscripcion', 'hero') ?></span>
+                    <span class="suscripcion-sub"><?= t('btn_suscripcion_sub', 'hero') ?></span>
+                </span>
+                <span class="suscripcion-arrow">→</span>
+            </a>
+        </div>
+
         <div class='trust'>
             <span class="trust-icon">⚙️</span>
             <span><?= t('hero_trust', 'hero') ?></span>

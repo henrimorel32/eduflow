@@ -1,0 +1,47 @@
+# Middlewares globaux pour Traefik
+
+http:
+  middlewares:
+    # Middleware de sécurité (headers)
+    security-headers:
+      headers:
+        frameDeny: true
+        sslRedirect: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 31536000
+        customFrameOptionsValue: "SAMEORIGIN"
+        customResponseHeaders:
+          X-Robots-Tag: "noindex,nofollow"
+    
+    # Rate limiting
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+    
+    # Compression
+    compress:
+      compress:
+        excludedContentTypes:
+          - text/event-stream
+    
+    # Auth basique pour le dashboard
+    auth:
+      basicAuth:
+        users:
+          # Généré avec: htpasswd -nb admin motdepasse
+          # Par défaut: admin / changeme
+          - "admin:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
+
+# Middlewares TCP (si besoin)
+tcp:
+  middlewares:
+    ip-allowlist:
+      ipAllowList:
+        sourceRange:
+          - "127.0.0.1/32"
+          - "10.0.0.0/8"

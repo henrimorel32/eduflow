@@ -1,0 +1,88 @@
+# ============================================================
+# TEMPLATE DOCKER COMPOSE - POUR CHAQUE ÉCOLE
+# ============================================================
+# Usage: docker-compose -f docker-compose.school-{SLUG}.yml up -d
+# 
+# Ce fichier est généré automatiquement pour chaque école
+# Chaque école a son propre container Next.js avec:
+# - Son propre sous-domaine (slug.henrimorel.com)
+# - Les sources partagées (/pasos/)
+# - Ses couleurs personnalisées (via variables d'env)
+# - Son logo (via volume)
+# ============================================================
+
+version: '3.8'
+
+services:
+  # NEXT.JS - Application école personnalisée
+  school_{SCHOOL_SLUG}:
+    image: node:20-alpine
+    container_name: edu_school_{SCHOOL_SLUG}
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      # Configuration école (personnalisé par école)
+      - SCHOOL_SLUG={SCHOOL_SLUG}
+      - SCHOOL_NAME={SCHOOL_NAME}
+      - SCHOOL_COLOR_PRIMARY={COLOR_PRIMARY}
+      - SCHOOL_COLOR_SECONDARY={COLOR_SECONDARY}
+      - SCHOOL_LOGO_URL={LOGO_URL}
+      - SCHOOL_DOMAIN={SCHOOL_SLUG}.henrimorel.com
+      
+      # Connexion BDD principale
+      - DATABASE_URL=postgresql://edu_admin:${POSTGRES_PASSWORD}@postgres:5432/edu_platform
+      - REDIS_URL=redis://redis:6379
+      
+      # API interne pour récupérer les configs
+      - API_BASE_URL=http://app_main
+      
+      # Next.js config
+      - NODE_ENV=production
+      - PORT=3000
+    
+    volumes:
+      # Sources Next.js partagées
+      - ./nextjs-template:/app:ro
+      
+      # Sources des formulaires PHP partagées (lecture seule)
+      - ../php/src/pages/pasos:/app/public/forms:ro
+      
+      # Configuration spécifique école
+      - school_{SCHOOL_SLUG}_data:/app/data
+      
+      # Logo de l'école
+      - {LOGO_PATH}:/app/public/logo.png:ro
+    
+    command: >
+      sh -c "npm ci --production && npm run build && npm start"
+    
+    networks:
+      - edu_internal
+      - proxy
+    
+    depends_on:
+      - postgres
+      - redis
+      - app_main
+    
+    labels:
+      # Traefik routing - Sous-domaine de l'école
+      - "traefik.enable=true"
+      - "traefik.http.routers.school-{SCHOOL_SLUG}.rule=Host(`{SCHOOL_SLUG}.henrimorel.com`)"
+      - "traefik.http.routers.school-{SCHOOL_SLUG}.entrypoints=websecure"
+      - "traefik.http.routers.school-{SCHOOL_SLUG}.tls.certresolver=letsencrypt"
+      - "traefik.http.services.school-{SCHOOL_SLUG}.loadbalancer.server.port=3000"
+      
+      # Middleware pour injecter les styles personnalisés
+      - "traefik.http.middlewares.school-{SCHOOL_SLUG}-theme.plugin.themepolicy.colors.primary={COLOR_PRIMARY}"
+      - "traefik.http.middlewares.school-{SCHOOL_SLUG}-theme.plugin.themepolicy.colors.secondary={COLOR_SECONDARY}"
+      - "traefik.http.routers.school-{SCHOOL_SLUG}.middlewares=school-{SCHOOL_SLUG}-theme"
+
+volumes:
+  school_{SCHOOL_SLUG}_data:
+
+networks:
+  edu_internal:
+    external: true
+  proxy:
+    external: true
