@@ -214,32 +214,69 @@ if [ -n "$CF_DNS_API_TOKEN" ] && [ -n "$CF_ZONE_ID" ]; then
     
     success "DNS créés"
     
-    # 6. ATTENTE PROPAGATION DNS
-    log "6️⃣  Attente propagation DNS (60s)..."
+    # 6. ATTENTE PROPAGATION DNS (vérifie les 2: domaine + www)
+    log "6️⃣  Attente propagation DNS (${DOMAIN} + www.${DOMAIN})..."
     sleep 60
     
-    for i in {1..10}; do
+    DNS_OK=0
+    for i in {1..15}; do
+        DOMAIN_OK=0
+        WWW_OK=0
+        
         if nslookup "$DOMAIN" 1.1.1.1 2>/dev/null | grep -q "${VPS_IP}"; then
-            success "DNS propagé"
+            DOMAIN_OK=1
+        fi
+        
+        if nslookup "www.$DOMAIN" 1.1.1.1 2>/dev/null | grep -q "${VPS_IP}"; then
+            WWW_OK=1
+        fi
+        
+        if [ $DOMAIN_OK -eq 1 ] && [ $WWW_OK -eq 1 ]; then
+            success "DNS propagés (${DOMAIN} + www.${DOMAIN})"
+            DNS_OK=1
             break
         fi
-        echo "   ⏳ Attente DNS... ($i/10)"
+        
+        echo "   ⏳ Attente DNS... ${DOMAIN}: $DOMAIN_OK, www.${DOMAIN}: $WWW_OK ($i/15)"
         sleep 10
     done
+    
+    if [ $DNS_OK -eq 0 ]; then
+        warning "DNS partiellement propagés - continuation..."
+    fi
 else
     warning "Token Cloudflare non configuré - DNS manuels requis"
-    warning "Créez un enregistrement A: ${DOMAIN} -> ${VPS_IP}"
+    warning "Créez les enregistrements A:"
+    warning "  - ${DOMAIN} -> ${VPS_IP}"
+    warning "  - www.${DOMAIN} -> ${VPS_IP}"
 fi
 
-# 7. ATTENTE CERTIFICAT SSL
-log "7️⃣  Attente certificat SSL..."
+# 7. ATTENTE CERTIFICATS SSL (pour les 2 domaines)
+log "7️⃣  Attente certificats SSL (${DOMAIN} + www.${DOMAIN})..."
+CERT_DOMAIN_OK=0
+CERT_WWW_OK=0
+
 for i in {1..30}; do
-    CERT_INFO=$(echo | openssl s_client -connect "${DOMAIN}:443" -servername "${DOMAIN}" 2>/dev/null | openssl x509 -noout -issuer 2>/dev/null || true)
-    if echo "$CERT_INFO" | grep -q "Let's Encrypt"; then
-        success "Certificat SSL OK (Let's Encrypt)"
+    if [ $CERT_DOMAIN_OK -eq 0 ]; then
+        if echo | openssl s_client -connect "${DOMAIN}:443" -servername "${DOMAIN}" 2>/dev/null | openssl x509 -noout 2>/dev/null | grep -q "Let's Encrypt"; then
+            log "   ✅ Certificat ${DOMAIN} OK"
+            CERT_DOMAIN_OK=1
+        fi
+    fi
+    
+    if [ $CERT_WWW_OK -eq 0 ]; then
+        if echo | openssl s_client -connect "www.${DOMAIN}:443" -servername "www.${DOMAIN}" 2>/dev/null | openssl x509 -noout 2>/dev/null | grep -q "Let's Encrypt"; then
+            log "   ✅ Certificat www.${DOMAIN} OK"
+            CERT_WWW_OK=1
+        fi
+    fi
+    
+    if [ $CERT_DOMAIN_OK -eq 1 ] && [ $CERT_WWW_OK -eq 1 ]; then
+        success "Tous les certificats SSL OK"
         break
     fi
-    echo "   ⏳ Attente certificat... ($i/30)"
+    
+    echo "   ⏳ Attente certificats... ($i/30)"
     sleep 10
 done
 
@@ -297,6 +334,7 @@ echo "🎉 DÉPLOIEMENT TERMINÉ!"
 echo "═══════════════════════════════════════════════════════════"
 echo "   🏫 École: $SCHOOL_NAME"
 echo "   🌐 URL: https://$DOMAIN"
+echo "   🌐 URL: https://www.$DOMAIN"
 echo "   📁 Répertoire: $SCHOOL_DIR"
 echo "   💾 Database: $DB_NAME"
 echo "   📊 Dashboard: http://$VPS_IP:8080"
