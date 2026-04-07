@@ -77,5 +77,6 @@ volumes:
 networks:
   edu_internal:
     driver: bridge
+    name: eduflow_edu_internal
   edu_proxy:
     external: true

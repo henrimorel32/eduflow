@@ -12,7 +12,11 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
     $contenido[$seccion] = getContent($seccion);
 }
 ?>
-
+<script
+  src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+  async
+  defer
+></script>
 <!-- HERO SECTION - Posicionamiento claro: NO vendemos software -->
 <section class="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-br from-gray-50 to-white">
     <!-- Elementos decorativos sutiles -->
@@ -572,68 +576,105 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
             en tu sistema actual. Sin compromiso, sin venta de software.
         </p>
         
-        <form class="bg-white rounded-3xl p-8 shadow-2xl max-w-2xl mx-auto text-left" id="form-auditoria"method="POST">
-            <div class="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Nombre completo</label>
-                    <input type="text" name="nombre" required 
-                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                           placeholder="Tu nombre">
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Correo institucional</label>
-                    <input type="email" name="email" required 
-                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                           placeholder="nombre@escuela.edu.co">
-                </div>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Nombre de la escuela</label>
-                    <input type="text" name="escuela" 
-                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                           placeholder="Institución Educativa...">
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Ciudad / País</label>
-                    <input type="text" name="ubicacion" 
-                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                           placeholder="Bogotá, Colombia">
-                </div>
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-gray-700 font-semibold mb-2">¿Qué sistemas usan actualmente? (breve lista)</label>
-                <textarea name="sistemas" rows="3" 
-                          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                          placeholder="Ej: Excel, Google Classroom, SGA X, plataforma de pagos Y..."></textarea>
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-gray-700 font-semibold mb-2">Principal dolor de cabeza con sus sistemas</label>
-                <select name="problema" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800">
-                    <option value="">Selecciona el problema principal</option>
-                    <option value="duplicados">Datos duplicados en varios sistemas</option>
-                    <option value="passwords">Muchas contraseñas para recordar</option>
-                    <option value="costos">Costos de licencias muy altos</option>
-                    <option value="desactualizado">Información desactualizada</option>
-                    <option value="soporte">Muchos tickets de soporte</option>
-                    <option value="otro">Otro (especificar en mensaje)</option>
-                </select>
-            </div>
-            
-            <button type="submit" 
-                    class="w-full py-4 bg-gray-900 text-white rounded-xl font-bold text-lg hover:bg-gray-800 transition transform hover:scale-[1.02] flex items-center justify-center gap-2">
-                Solicitar Auditoría Gratuita
-                <i data-lucide="arrow-right" class="w-5 h-5"></i>
-            </button>
-            
-            <p class="text-sm text-gray-500 mt-4 text-center flex items-center justify-center gap-1">
-                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                No te venderemos software. Solo analizaremos tu infraestructura actual.
-            </p>
-        </form>
+       <form class="bg-white rounded-3xl p-8 shadow-2xl max-w-2xl mx-auto text-left" id="form-auditoria" method="POST">
+    <!-- Widget Turnstile -->
+    <div class="cf-turnstile mb-6" 
+         data-sitekey="0x4AAAAAAC1v_HDi1v6nPJoO"
+         data-callback="onTurnstileSuccess"
+         data-theme="light"></div>
+    
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">Nombre completo</label>
+            <input type="text" name="nombre" required 
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
+                   placeholder="Tu nombre">
+        </div>
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">Correo institucional</label>
+            <input type="email" name="email" required 
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
+                   placeholder="nombre@escuela.edu.co">
+        </div>
+    </div>
+    
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">Nombre de la escuela</label>
+            <input type="text" name="escuela" 
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
+                   placeholder="Institución Educativa...">
+        </div>
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">Ciudad / País</label>
+            <input type="text" name="ubicacion" 
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
+                   placeholder="Bogotá, Colombia">
+        </div>
+    </div>
+    
+    <div class="mb-6">
+        <label class="block text-gray-700 font-semibold mb-2">¿Qué sistemas usan actualmente? (breve lista)</label>
+        <textarea name="sistemas" rows="3" 
+                  class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
+                  placeholder="Ej: Excel, Google Classroom, SGA X, plataforma de pagos Y..."></textarea>
+    </div>
+    
+    <div class="mb-6">
+        <label class="block text-gray-700 font-semibold mb-2">Principal dolor de cabeza con sus sistemas</label>
+        <select name="problema" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800">
+            <option value="">Selecciona el problema principal</option>
+            <option value="duplicados">Datos duplicados en varios sistemas</option>
+            <option value="passwords">Muchas contraseñas para recordar</option>
+            <option value="costos">Costos de licencias muy altos</option>
+            <option value="desactualizado">Información desactualizada</option>
+            <option value="soporte">Muchos tickets de soporte</option>
+            <option value="otro">Otro (especificar en mensaje)</option>
+        </select>
+    </div>
+    
+    <!-- Champ caché pour le token Turnstile -->
+    <input type="hidden" name="cf-turnstile-response" id="cf-turnstile-response">
+    
+    <button type="submit" id="submit-btn"
+            class="w-full py-4 bg-gray-900 text-white rounded-xl font-bold text-lg hover:bg-gray-800 transition transform hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+        <span>Solicitar Auditoría Gratuita</span>
+        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+    </button>
+    
+    <p class="text-sm text-gray-500 mt-4 text-center flex items-center justify-center gap-1">
+        <i data-lucide="shield-check" class="w-4 h-4"></i>
+        No te venderemos software. Solo analizaremos tu infraestructura actual.
+    </p>
+</form>
+
+<!-- Script Cloudflare Turnstile -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script>
+    // Callback quand Turnstile est validé
+    function onTurnstileSuccess(token) {
+        document.getElementById('cf-turnstile-response').value = token;
+        document.getElementById('submit-btn').disabled = false;
+    }
+    
+    // Désactiver le bouton au départ
+    document.getElementById('submit-btn').disabled = true;
+    
+    // Validation du formulaire
+    document.getElementById('form-auditoria').addEventListener('submit', function(e) {
+        const token = document.getElementById('cf-turnstile-response').value;
+        
+        if (!token) {
+            e.preventDefault();
+            alert('Por favor completa la verificación de seguridad');
+            return false;
+        }
+        
+        // Le token sera envoyé avec le formulaire
+        console.log('Token Turnstile:', token);
+    });
+</script>
     </div>
 </section>
 
@@ -652,8 +693,20 @@ document.getElementById('form-auditoria').addEventListener('submit', async funct
     e.preventDefault();
 
     const form = e.target;
-    const formData = new FormData(form);
     const button = form.querySelector('button');
+    
+    // Vérifier le token Turnstile
+    const token = document.getElementById('cf-turnstile-response').value;
+    if (!token) {
+        mostrarMensajeAuditoria('❌ Por favor completa la verificación de seguridad (Turnstile)', 'error');
+        return false;
+    }
+    
+    // Créer le FormData APRÈS vérification du token
+    const formData = new FormData(form);
+    
+    // S'assurer que le token est dans le FormData
+    formData.set('cf-turnstile-response', token);
 
     // UX sympa 😏
     button.disabled = true;

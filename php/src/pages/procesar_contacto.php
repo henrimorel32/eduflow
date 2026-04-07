@@ -41,7 +41,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     }
 
     // --------------------------------------------------
-    // 🚀 3. Envoi des emails si tout est OK
+    // 🛡️ 3. Vérification Turnstile (Cloudflare)
+    // --------------------------------------------------
+    $turnstileToken = $_POST['cf-turnstile-response'] ?? '';
+    
+    if (empty($turnstileToken)) {
+        $errores[] = "Verificación de seguridad requerida";
+    } else {
+        // Vérification avec l'API Cloudflare
+        $turnstileSecret = '0x4AAAAAAC1v_DA1UDl-TkqtWNOgE6ltsp0';
+        $verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+        
+        $ch = curl_init($verifyUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+            'secret' => $turnstileSecret,
+            'response' => $turnstileToken,
+            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? ''
+        ]));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode === 200 && $response) {
+            $result = json_decode($response, true);
+            if (!$result || $result['success'] !== true) {
+                $errores[] = "Verificación de seguridad fallida. Por favor intenta de nuevo.";
+                error_log('Turnstile verification failed: ' . json_encode($result));
+            }
+        } else {
+            $errores[] = "Error en verificación de seguridad. Por favor intenta de nuevo.";
+            error_log('Turnstile API error: HTTP ' . $httpCode);
+        }
+    }
+
+    // --------------------------------------------------
+    // 🚀 4. Envoi des emails si tout est OK
     // --------------------------------------------------
     if (empty($errores)) {
 
@@ -140,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         ]);
 
         // --------------------------------------------------
-        // 🎯 4. Gestion du résultat global
+        // 🎯 5. Gestion du résultat global
         // --------------------------------------------------
         if ($result_admin === true && $result_user === true) {
             $exito = true;
@@ -151,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 }
 
 // --------------------------------------------------
-// 📤 5. Retour JSON (si appel AJAX) OU variable PHP
+// 📤 6. Retour JSON (si appel AJAX) OU variable PHP
 // --------------------------------------------------
 
 // 👉 Si tu veux l’utiliser en AJAX

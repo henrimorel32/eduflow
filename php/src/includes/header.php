@@ -318,13 +318,15 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
     <?= generateSchema($seo, $currentPage) ?>
     
     <!-- ========== GOOGLE ANALYTICS (décommente quand prêt) ========== -->
-    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'GA_MEASUREMENT_ID');
-    </script> -->
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-90M0NHP0R3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-90M0NHP0R3');
+</script>
 </head>
 <body class="font-sans antialiased text-gray-800 bg-white overflow-x-hidden selection:bg-primary-100 selection:text-primary-900">
     <!-- Google Tag Manager (noscript) -->

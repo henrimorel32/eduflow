@@ -86,7 +86,7 @@ services:
       # Logo de l'école (si présent)
       ${LOGO_PATH:+- ${LOGO_PATH}:/app/public/logo.png:ro}
     networks:
-      - edu_internal
+      - eduflow_edu_internal
       - proxy
     labels:
       # Traefik routing
@@ -97,7 +97,7 @@ services:
       - "traefik.http.services.school-${SCHOOL_SLUG}.loadbalancer.server.port=3000"
 
 networks:
-  edu_internal:
+  eduflow_edu_internal:
     external: true
   proxy:
     external: true

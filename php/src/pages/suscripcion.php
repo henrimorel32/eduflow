@@ -4,10 +4,40 @@
  * Formulaire pour créer une page d'inscription personnalisée
  */
 
+
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../components/Mailer.php';
 require_once __DIR__ . '/../components/StorageManager.php';
 require_once __DIR__ . '/../components/DockerComposeGenerator.php';
+
+
+// TEMPORAIRE - À supprimer après debug
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', '/var/log/php-suscripcion.log');
+
+// Vérifier les dépendances
+$requiredFiles = [
+    __DIR__ . '/../includes/config.php',
+    __DIR__ . '/../components/Mailer.php',
+    __DIR__ . '/../components/StorageManager.php',
+    __DIR__ . '/../components/DockerComposeGenerator.php'
+];
+
+foreach ($requiredFiles as $file) {
+    if (!file_exists($file)) {
+        die("FICHIER MANQUANT: $file");
+    }
+}
+
+// Vérifier la connexion DB
+try {
+    $pdo->query("SELECT 1");
+    error_log("✅ Connexion DB OK");
+} catch (Exception $e) {
+    die("❌ Connexion DB échouée: " . $e->getMessage());
+}
 
 // Démarrer la session
 if (session_status() === PHP_SESSION_NONE) {
@@ -132,6 +162,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Upload logo: Pas de fichier ou erreur: " . ($_FILES['logo']['error'] ?? 'no file'));
     }
     
+    // Vérification Turnstile (anti-bot)
+    if (empty($errores)) {
+        $turnstileToken = $_POST['cf-turnstile-response'] ?? '';
+        
+        if (empty($turnstileToken)) {
+            $errores[] = 'Verificación de seguridad requerida';
+        } else {
+            // Vérification avec l'API Cloudflare
+            $turnstileSecret = '0x4AAAAAAC1v_DA1UDl-TkqtWNOgE6ltsp0';
+            $verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+            
+            $ch = curl_init($verifyUrl);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+                'secret' => $turnstileSecret,
+                'response' => $turnstileToken,
+                'remoteip' => $_SERVER['REMOTE_ADDR'] ?? ''
+            ]));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            
+            if ($httpCode === 200 && $response) {
+                $result = json_decode($response, true);
+                if (!$result || $result['success'] !== true) {
+                    $errores[] = 'Verificación de seguridad fallida. Por favor intenta de nuevo.';
+                    error_log('Turnstile verification failed suscripcion: ' . json_encode($result));
+                }
+            } else {
+                $errores[] = 'Error en verificación de seguridad. Por favor intenta de nuevo.';
+                error_log('Turnstile API error suscripcion: HTTP ' . $httpCode);
+            }
+        }
+    }
+    
     // Si pas d'erreurs, créer l'école
     if (empty($errores)) {
         
@@ -203,62 +270,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $schoolId = $pdo->lastInsertId();
             $schoolData['id'] = $schoolId;
             
-            // NOTE: Les fichiers docker-compose ne sont PAS créés ici
-            // car le conteneur PHP n'a pas les droits sur /var/schools
-            // Un admin doit exécuter sur l'hôte: ./scripts/create-school.sh $slug
+            // Ajouter à la queue de déploiement (création asynchrone du container)
+            $deployResult = addToDeployQueue($schoolId, $slug, $dockerInfo['subdomain'], $nombre_escuela);
+            if ($deployResult['success']) {
+                error_log("✅ École ajoutée à la queue de déploiement: " . ($deployResult['queue_id'] ?? 'N/A'));
+            } else {
+                error_log("⚠️ Erreur ajout queue (non bloquant): " . ($deployResult['error'] ?? 'Unknown'));
+            }
             
             // Insérer aussi dans PostgreSQL pour le template Next.js
-            try {
-                $pg_host = getenv('POSTGRES_HOST') ?: 'postgres';
-                $pg_db = getenv('POSTGRES_DB') ?: 'edu_platform';
-                $pg_user = getenv('POSTGRES_USER') ?: 'edu_admin';
-                $pg_pass = getenv('POSTGRES_PASSWORD') ?: '';
-                
-                $pgPdo = new PDO(
-                    "pgsql:host=$pg_host;dbname=$pg_db",
-                    $pg_user,
-                    $pg_pass,
-                    [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    ]
-                );
-                
-                $stmt = $pgPdo->prepare("INSERT INTO schools (
-                    nombre, slug, dominio, email_director, telefono,
-                    direccion, ciudad, pais, color_primario, color_secundario,
-                    logo_url, favicon_url, estado, trial_hasta
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'activa', ?) 
-                ON CONFLICT (slug) DO UPDATE SET
-                    logo_url = EXCLUDED.logo_url,
-                    favicon_url = EXCLUDED.favicon_url,
-                    color_primario = EXCLUDED.color_primario,
-                    color_secundario = EXCLUDED.color_secundario
-                RETURNING id");
-                
-                $stmt->execute([
-                    $nombre_escuela,
-                    $slug,
-                    $dockerInfo['subdomain'],
-                    $email,
-                    $telefono,
-                    '', // direccion
-                    $ciudad,
-                    $pais,
-                    $color_primario,
-                    $color_secundario,
-                    $logo_url,
-                    $favicon_url,
-                    $fecha_fin
-                ]);
-                
-                $pgSchoolId = $stmt->fetchColumn();
-                error_log("École insérée dans PostgreSQL avec ID: $pgSchoolId");
+try {
+    $pg_host = getenv('POSTGRES_HOST') ?: 'edu_postgres';
+    $pg_db = getenv('POSTGRES_DB') ?: 'edu_platform';
+    $pg_user = getenv('POSTGRES_USER') ?: 'edu_admin';
+    $pg_pass = getenv('POSTGRES_PASSWORD') ?: '';
+    
+    // Fallback si pas d'environnement
+    if (empty($pg_pass)) {
+        $pg_pass = 'P9xL2vQ8mK4rT6nB3cW5sH7';
+    }
+    
+    $pgPdo = new PDO(
+        "pgsql:host=$pg_host;dbname=$pg_db",
+        $pg_user,
+        $pg_pass,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_TIMEOUT => 5,
+        ]
+    );
+    
+    $stmt = $pgPdo->prepare("INSERT INTO schools (
+        nombre, slug, dominio, email_director, telefono,
+        direccion, ciudad, pais, color_primario, color_secundario,
+        logo_url, favicon_url, estado, trial_hasta
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'activa', ?) 
+    ON CONFLICT (slug) DO UPDATE SET
+        logo_url = EXCLUDED.logo_url,
+        favicon_url = EXCLUDED.favicon_url,
+        color_primario = EXCLUDED.color_primario,
+        color_secundario = EXCLUDED.color_secundario,
+        nombre = EXCLUDED.nombre,
+        dominio = EXCLUDED.dominio,
+        email_director = EXCLUDED.email_director
+    RETURNING id");
+    
+    $stmt->execute([
+        $nombre_escuela,
+        $slug,
+        $dockerInfo['subdomain'],
+        $email,
+        $telefono,
+        '', // direccion
+        $ciudad,
+        $pais,
+        $color_primario,
+        $color_secundario,
+        $logo_url,
+        $favicon_url,
+        $fecha_fin
+    ]);
+    
+    $pgSchoolId = $stmt->fetchColumn();
+    error_log("✅ École insérée dans PostgreSQL avec ID: $pgSchoolId, logo: " . ($logo_url ?: 'NULL'));
                 
             } catch (Exception $pgError) {
                 error_log("Erreur insertion PostgreSQL (non bloquante): " . $pgError->getMessage());
                 // On ne bloque pas l'inscription si PostgreSQL échoue
             }
+            
             
             // Envoyer l'email de confirmation
             enviarEmailConfirmacion($email, $schoolData, $dockerInfo);
@@ -275,6 +356,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log("Erreur création école: " . $e->getMessage());
             $errores[] = "Error: " . $e->getMessage();
         }
+    }
+}
+
+/**
+ * Ajouter l'école à la queue de déploiement Docker
+ * Appel direct à la DB (plus fiable qu'une API HTTP interne)
+ */
+function addToDeployQueue(int $schoolId, string $slug, string $domain, string $name): array {
+    global $pdo;
+    
+    try {
+        // Vérifier si un déploiement est déjà en cours
+        $stmt = $pdo->prepare("SELECT id FROM school_deploy_queue 
+                              WHERE school_id = ? AND status IN ('pending', 'processing')");
+        $stmt->execute([$schoolId]);
+        if ($stmt->fetch()) {
+            return [
+                'success' => true,
+                'message' => 'Déploiement déjà en cours',
+                'already_queued' => true
+            ];
+        }
+        
+        // Insérer dans la queue
+        $stmt = $pdo->prepare("INSERT INTO school_deploy_queue 
+            (school_id, slug, domain, name, status, attempts, created_at) 
+            VALUES (?, ?, ?, ?, 'pending', 0, NOW())");
+        
+        $stmt->execute([$schoolId, $slug, $domain, $name]);
+        $queueId = $pdo->lastInsertId();
+        
+        return [
+            'success' => true,
+            'queue_id' => $queueId,
+            'message' => 'École ajoutée à la queue de déploiement',
+            'status' => 'pending',
+            'estimated_time' => '1-2 minutes'
+        ];
+        
+    } catch (PDOException $e) {
+        error_log("Erreur DB addToDeployQueue: " . $e->getMessage());
+        return [
+            'success' => false,
+            'error' => $e->getMessage()
+        ];
     }
 }
 
@@ -718,8 +844,20 @@ $paises_america = [
                             </div>
                         </div>
                         
-                        <button type="submit" 
-                                class="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center">
+                        <!-- Widget Turnstile (Cloudflare) -->
+                        <div class="flex justify-center">
+                            <div class="cf-turnstile" 
+                                 data-sitekey="0x4AAAAAAC1v_HDi1v6nPJoO"
+                                 data-callback="onTurnstileSuccess"
+                                 data-theme="light"></div>
+                        </div>
+                        
+                        <!-- Champ caché pour le token -->
+                        <input type="hidden" name="cf-turnstile-response" id="cf-turnstile-response">
+                        
+                        <button type="submit" id="submitBtn"
+                                class="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center opacity-50 cursor-not-allowed"
+                                disabled>
                             <i class="fas fa-magic mr-2"></i>
                             <?= t('boton_crear') ?>
                         </button>
@@ -1101,8 +1239,23 @@ $paises_america = [
                 }, step.delay);
             });
             
+            // Vérifier le token Turnstile avant envoi
+            const turnstileToken = document.getElementById('cf-turnstile-response')?.value;
+            if (!turnstileToken) {
+                overlay.classList.add('hidden');
+                alert('Por favor completa la verificación de seguridad (Turnstile)');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-magic mr-2"></i><?= t('boton_crear') ?>';
+                }
+                return false;
+            }
+            
             // Soumettre en AJAX pour garder l'overlay visible
             const formData = new FormData(this);
+            
+            // S'assurer que le token est dans le FormData
+            formData.set('cf-turnstile-response', turnstileToken);
             
             fetch(window.location.href, {
                 method: 'POST',
@@ -1124,6 +1277,31 @@ $paises_america = [
                     submitBtn.innerHTML = '<i class="fas fa-magic mr-2"></i><?= t('boton_crear') ?>';
                 }
             });
+        });
+    </script>
+    
+    <!-- Script Cloudflare Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    
+    <script>
+        // Callback quand Turnstile est validé
+        function onTurnstileSuccess(token) {
+            document.getElementById('cf-turnstile-response').value = token;
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        
+        // Vérifier Turnstile avant soumission
+        document.getElementById('suscripcionForm')?.addEventListener('submit', function(e) {
+            const token = document.getElementById('cf-turnstile-response').value;
+            if (!token) {
+                e.preventDefault();
+                alert('Por favor completa la verificación de seguridad');
+                return false;
+            }
         });
     </script>
     
