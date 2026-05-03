@@ -180,12 +180,48 @@ try {
     
     $queueId = $pdo->lastInsertId();
     
-    logApi("Succès: École ajoutée à la queue - Queue ID: $queueId");
+    logApi("Succès: École ajoutée à la queue DB - Queue ID: $queueId");
+    
+    // --- Envoyer le job dans Redis (BullMQ) via le Queue API ---
+    $queueApiUrl = getenv('QUEUE_API_URL') ?: 'http://queue-api:3001/deploy';
+    $payload = json_encode([
+        'school_id' => (int)$data['school_id'],
+        'slug'      => $slug,
+        'domain'    => $domain,
+        'name'      => $data['name']
+    ]);
+    
+    $opts = [
+        'http' => [
+            'method'  => 'POST',
+            'header'  => "Content-Type: application/json\r\nAccept: application/json",
+            'content' => $payload,
+            'timeout' => 5
+        ]
+    ];
+    $context = stream_context_create($opts);
+    $queueResponse = @file_get_contents($queueApiUrl, false, $context);
+    
+    if ($queueResponse === false) {
+        logApi("Warning: Impossible de contacter le Queue API à $queueApiUrl");
+        $redisJobId = null;
+    } else {
+        $queueResult = json_decode($queueResponse, true);
+        if (!empty($queueResult['success']) && !empty($queueResult['jobId'])) {
+            $redisJobId = $queueResult['jobId'];
+            logApi("Succès: Job ajouté à Redis - Job ID: $redisJobId");
+        } else {
+            logApi("Warning: Queue API a répondu avec une erreur: " . ($queueResponse ?: 'vide'));
+            $redisJobId = null;
+        }
+    }
+    // -----------------------------------------------------------
     
     echo json_encode([
         'success' => true,
         'message' => 'École ajoutée à la queue de déploiement',
         'queue_id' => $queueId,
+        'redis_job_id' => $redisJobId,
         'status' => 'pending',
         'estimated_time' => '1-2 minutes'
     ]);

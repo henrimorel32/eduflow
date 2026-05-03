@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         ";
 
         $result_admin = Mailer::envoyer([
-            'to' => 'penelope@henrimorel.com',
+            'to' => 'henri@henrimorel.com',
             'subject' => $subject_admin,
             'body' => $body_admin
         ]);

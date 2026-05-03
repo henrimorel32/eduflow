@@ -392,12 +392,28 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                         🎓 Suscribir Colegio
                     </a>
                     
+                    <a href="<?= url('saberpro') ?>" class="<?= isActive('saberpro') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                        </span>
+                        Preparación Saber PRO
+                    </a>
+
                     <a href="<?= url('icfes') ?>" class="<?= isActive('icfes') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary-500"></span>
                         </span>
                         Nuestra plataforma ICFES
+                    </a>
+
+                    <a href="<?= url('aplicaciones') ?>" class="<?= isActive('aplicaciones') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+                        </span>
+                        Nuestras aplicaciones
                     </a>
 
                       <a href="<?= url('contacto') ?>" class="<?= isActive('contacto') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
@@ -463,6 +479,17 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                     </div>
                 </a>
                 
+                <a href="<?= url('saberpro') ?>" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-orange-50 text-gray-700 hover:text-orange-600 transition-all group">
+                    <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                        <i data-lucide="briefcase" class="w-5 h-5 text-orange-600"></i>
+                    </div>
+                    <div>
+                        <span class="font-semibold block">Preparación Saber PRO</span>
+                        <span class="text-xs text-gray-500">Simulacros reales</span>
+                    </div>
+                    <span class="ml-auto px-2 py-1 bg-orange-500 text-white text-xs rounded-full font-bold">TOP</span>
+                </a>
+
                 <a href="<?= url('icfes') ?>" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary-50 text-gray-700 hover:text-secondary-600 transition-all group">
                     <div class="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center group-hover:bg-secondary-200 transition-colors">
                         <i data-lucide="brain" class="w-5 h-5 text-secondary-600"></i>
@@ -472,6 +499,17 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                         <span class="text-xs text-gray-500">IA adaptativa</span>
                     </div>
                     <span class="ml-auto px-2 py-1 bg-secondary-500 text-white text-xs rounded-full font-bold">NUEVO</span>
+                </a>
+
+                <a href="<?= url('aplicaciones') ?>" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-50 text-gray-700 hover:text-purple-600 transition-all group">
+                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                        <i data-lucide="layout-grid" class="w-5 h-5 text-purple-600"></i>
+                    </div>
+                    <div>
+                        <span class="font-semibold block">Nuestras aplicaciones</span>
+                        <span class="text-xs text-gray-500">Todas nuestras plataformas</span>
+                    </div>
+                    <span class="ml-auto px-2 py-1 bg-purple-500 text-white text-xs rounded-full font-bold">NUEVO</span>
                 </a>
                 
                 <a href="<?= url('suscripcion') ?>" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 text-gray-700 hover:text-orange-700 transition-all group border-2 border-yellow-400">

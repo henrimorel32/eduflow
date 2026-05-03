@@ -29,6 +29,7 @@ services:
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
+      - QUEUE_API_URL=http://queue-api:3001/deploy
     depends_on:
       - mysql
     networks:
@@ -61,9 +62,103 @@ services:
     networks:
       - edu_network
 
+  # ============================================================
+  # REDIS - Queue BullMQ
+  # ============================================================
+  redis:
+    image: redis:7-alpine
+    container_name: edu_redis_dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - edu_network
+      - edu_proxy
+
+  # ============================================================
+  # POSTGRESQL - Base de données pour les écoles Next.js
+  # ============================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: edu_postgres_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: edu_platform
+      POSTGRES_USER: edu_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - edu_network
+      - edu_proxy
+
+  # ============================================================
+  # QUEUE API - Pont PHP vers Redis/BullMQ
+  # ============================================================
+  queue-api:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile
+    container_name: edu_queue_api_dev
+    restart: unless-stopped
+    command: ["node", "queue-api.js"]
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QUEUE_API_PORT: 3001
+    ports:
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - ./scripts:/app:ro
+      - /app/node_modules
+    networks:
+      - edu_network
+    depends_on:
+      - redis
+
+  # ============================================================
+  # WORKER - Déploiement des écoles via Docker API
+  # ============================================================
+  # Note: sur Mac, Docker Desktop peut avoir des restrictions avec
+  # les bind mounts depuis un container. Si le worker échoue à
+  # créer des containers, lancez-le hors Docker:
+  #   cd scripts && npm install && REDIS_HOST=localhost node worker.js
+  # ============================================================
+  worker:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile
+    container_name: edu_worker_dev
+    restart: unless-stopped
+    command: ["node", "worker.js"]
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      WORKER_CONCURRENCY: 2
+      APPS_BASE_DIR: ${PWD}/apps
+      TEMPLATE_PATH: ${PWD}/apps/eduflow/nextjs-template
+      UPLOADS_BASE_DIR: ${PWD}/php/src
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./scripts:/app
+      - /app/node_modules
+      - ./nextjs-template:${PWD}/apps/eduflow/nextjs-template:ro
+      - ./apps:${PWD}/apps
+      - ./php/src/uploads:${PWD}/php/src/uploads:ro
+    networks:
+      - edu_network
+      - edu_proxy
+    depends_on:
+      - redis
+
 volumes:
   mysql_data_dev:
+  postgres_data_dev:
 
 networks:
   edu_network:
+    driver: bridge
+  edu_proxy:
     driver: bridge

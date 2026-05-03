@@ -15,6 +15,7 @@
                 <div>
                     <h4 class="text-white font-bold mb-4">Soluciones</h4>
                     <ul class="space-y-2 text-sm">
+                        <li><a href="<?= url('saberpro') ?>" class="hover:text-white transition text-orange-400 font-semibold">⭐ Preparación Saber PRO</a></li>
                         <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition">Gestión de Admisiones</a></li>
                         <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition">Comunicación Padres</a></li>
                         <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition">Seguimiento Académico</a></li>
@@ -26,6 +27,8 @@
                     <ul class="space-y-2 text-sm">
                         <li><a href="<?= url('home') ?>" class="hover:text-white transition">Inicio</a></li>
                         <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition">Soluciones</a></li>
+                        <li><a href="<?= url('aplicaciones') ?>" class="hover:text-white transition">Nuestras aplicaciones</a></li>
+                        <li><a href="<?= url('saberpro') ?>" class="hover:text-white transition text-orange-400 font-semibold">Preparación Saber PRO</a></li>
                         <li><a href="<?= url('contacto') ?>" class="hover:text-white transition">Contacto</a></li>
                     </ul>
                 </div>
@@ -35,7 +38,7 @@
                     <ul class="space-y-2 text-sm">
                         <li class="flex items-center gap-2">
                             <i data-lucide="mail" class="w-4 h-4"></i>
-                            penelope@henrimorel.com
+                            henri@henrimorel.com
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="phone" class="w-4 h-4"></i>

@@ -42,7 +42,7 @@ $exito = false;
                         </div>
                         <div>
                             <h3 class="font-bold text-gray-900">Email</h3>
-                            <p class="text-gray-600">penelope@henrimorel.com</p>
+                            <p class="text-gray-600">henri@henrimorel.com</p>
                             <p class="text-sm text-gray-500">Respondemos en 24h</p>
                         </div>
                     </div>

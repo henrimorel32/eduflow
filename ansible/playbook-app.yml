@@ -1,0 +1,203 @@
+---
+# Deploy ESchool App
+
+- name: Deploy ESchool
+  hosts: production
+  become: yes
+  become_user: root
+  vars:
+    app_dir: /opt/docker/apps/eduflow
+
+  tasks:
+    - name: Create directories
+      file:
+        path: "{{ app_dir }}/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - ""
+        - "php"
+        - "php/src"
+        - "nginx"
+        - "mysql"
+        - "logs/nginx"
+        - "scripts"
+        - "nextjs-template"
+
+    - name: Copy docker-compose files
+      copy:
+        src: "{{ playbook_dir }}/../{{ item }}"
+        dest: "{{ app_dir }}/{{ item }}"
+      loop:
+        - docker-compose.yml
+        - docker-compose.infrastructure.yml
+
+    - name: Copy Dockerfile to php/
+      copy:
+        src: "{{ playbook_dir }}/../php/Dockerfile"
+        dest: "{{ app_dir }}/php/Dockerfile"
+
+    - name: Copy composer.json
+      copy:
+        src: "{{ playbook_dir }}/../php/src/composer.json"
+        dest: "{{ app_dir }}/php/src/composer.json"
+
+    - name: Copy nginx config files
+      copy:
+        src: "{{ playbook_dir }}/../nginx/{{ item }}"
+        dest: "{{ app_dir }}/nginx/{{ item }}"
+      loop:
+        - nginx.conf
+        - default.conf
+
+    - name: Copy mysql files
+      copy:
+        src: "{{ playbook_dir }}/../mysql/"
+        dest: "{{ app_dir }}/mysql/"
+
+    - name: Copy PHP source
+      synchronize:
+        src: "{{ playbook_dir }}/../php/src/"
+        dest: "{{ app_dir }}/php/src/"
+        delete: yes
+        rsync_opts:
+          - "--exclude=.env"
+          - "--exclude=.git"
+
+    - name: Copy scripts package.json
+      copy:
+        src: "{{ playbook_dir }}/../scripts/package.json"
+        dest: "{{ app_dir }}/scripts/package.json"
+
+    - name: Copy scripts source
+      synchronize:
+        src: "{{ playbook_dir }}/../scripts/"
+        dest: "{{ app_dir }}/scripts/"
+        delete: yes
+        rsync_opts:
+          - "--exclude=node_modules"
+          - "--exclude=.env"
+
+    - name: Copy nextjs-template
+      synchronize:
+        src: "{{ playbook_dir }}/../nextjs-template/"
+        dest: "{{ app_dir }}/nextjs-template/"
+        delete: yes
+        rsync_opts:
+          - "--exclude=node_modules"
+          - "--exclude=.env"
+          - "--exclude=.next"
+
+    - name: Create .env
+      copy:
+        dest: "{{ app_dir }}/.env"
+        content: |
+          # Database
+          MYSQL_ROOT_PASSWORD=ChangeMeRoot123!
+          MYSQL_DATABASE=eduflow
+          MYSQL_USER=edu_user
+          MYSQL_PASSWORD=ChangeMeUser123!
+          DB_HOST=mysql
+          DB_PORT=3306
+          DB_NAME=eduflow
+          DB_USER=edu_user
+          DB_PASS=ChangeMeUser123!
+          
+          # Application
+          APP_ENV=production
+          APP_DEBUG=false
+          
+          # Email (SMTP Gmail)
+          SMTP_HOST=smtp.gmail.com
+          SMTP_PORT=587
+          SMTP_USER=henri@henrimorel.com
+          SMTP_PASS=fgufapesjsxreeoldans
+          SMTP_ENCRYPTION=tls
+          
+          # Gmail SMTP pour inscripciones
+          EMAIL_USER=henri@henrimorel.com
+          EMAIL_PASSWORD=fgufapesjsxreeoldans
+          
+          # OVH Object Storage (S3)
+          OVH_S3_ENDPOINT=https://s3.gra.io.cloud.ovh.net/
+          OVH_S3_ACCESS_KEY=18c5bb6059db4da4b32901b1cd1ce69e
+          OVH_S3_SECRET_KEY=c39ad9ccce324f9d923fb8e899750171
+          OVH_S3_BUCKET=tan-chu
+          OVH_S3_REGION=gra
+          OVH_S3_USER=user-bXa6NffcjXQB
+          
+          # PostgreSQL & Redis
+          POSTGRES_PASSWORD=ChangeMePostgres123!
+          REDIS_PASSWORD=ChangeMeRedis123!
+        mode: '0600'
+
+    - name: Fix phpMyAdmin port
+      replace:
+        path: "{{ app_dir }}/docker-compose.yml"
+        regexp: '"127\.0\.0\.1:8080:80"'
+        replace: '"127.0.0.1:8081:80"'
+
+    - name: Create docker-compose.traefik.yml
+      copy:
+        dest: "{{ app_dir }}/docker-compose.traefik.yml"
+        content: |
+          services:
+            nginx:
+              labels:
+                - "traefik.enable=true"
+                - "traefik.docker.network=edu_proxy"
+                - "traefik.http.routers.edu-nginx.rule=Host(`henrimorel.com`) || Host(`www.henrimorel.com`)"
+                - "traefik.http.routers.edu-nginx.entrypoints=web"
+                - "traefik.http.routers.edu-nginx-secure.rule=Host(`henrimorel.com`) || Host(`www.henrimorel.com`)"
+                - "traefik.http.routers.edu-nginx-secure.entrypoints=websecure"
+                - "traefik.http.routers.edu-nginx-secure.tls=true"
+                - "traefik.http.routers.edu-nginx-secure.tls.certresolver=letsencrypt"
+                - "traefik.http.services.edu-nginx.loadbalancer.server.port=80"
+              networks:
+                - edu_network
+                - edu_proxy
+
+          networks:
+            edu_proxy:
+              external: true
+
+    - name: Fix permissions
+      file:
+        path: "{{ app_dir }}"
+        owner: henri
+        group: henri
+        recurse: yes
+
+    - name: Start app
+      become: yes
+      become_user: henri
+      shell: |
+        cd {{ app_dir }} && docker compose -f docker-compose.yml -f docker-compose.infrastructure.yml -f docker-compose.traefik.yml up -d --build 2>&1
+      register: compose_result
+      ignore_errors: yes
+
+    - name: Wait for containers
+      pause:
+        seconds: 10
+
+    - name: Check if containers are running
+      become: yes
+      become_user: henri
+      shell: |
+        docker ps --filter "name=edu_" --format "{% raw %}{{.Names}}{% endraw %}" | wc -l
+      register: container_count
+
+    - name: Fail if no containers
+      fail:
+        msg: "Les conteneurs ne sont pas démarrés"
+      when: container_count.stdout | int == 0
+
+    - name: Summary
+      debug:
+        msg:
+          - "=========================================="
+          - "  App déployée !"
+          - "=========================================="
+          - "https://henrimorel.com"
+          - "https://traefik.henrimorel.com (admin/admin)"
+          - "=========================================="

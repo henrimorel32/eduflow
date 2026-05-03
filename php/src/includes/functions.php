@@ -145,6 +145,28 @@ function getSeoData(string $page): array {
             'schema_type' => 'ContactPage',
             'cta_nav' => 'Agendar Demo',
         ],
+        
+        'aplicaciones' => [
+            'title' => 'Nuestras Aplicaciones Educativas | ICFES, Saber, Saber PRO y más - HM',
+            'description' => 'Descubre nuestras plataformas de preparación para exámenes en Colombia: ICFES, Pruebas Saber, Quiero Ser Quiero Saber, Saber PRO y Concurso Docente.',
+            'keywords' => 'aplicaciones educativas Colombia, preparación ICFES, pruebas Saber, Saber PRO, concurso docente, orientación vocacional',
+            'h1' => 'Nuestras Creaciones y Aplicaciones Educativas',
+            'canonical' => '/aplicaciones',
+            'og_image' => '/og-aplicaciones.jpg',
+            'schema_type' => 'Product',
+            'cta_nav' => 'Ver Aplicaciones',
+        ],
+        
+        'saberpro' => [
+            'title' => 'Preparación Saber PRO Colombia | Simulacros y Entrenamiento Inteligente — Mente Viva',
+            'description' => 'La plataforma #1 para preparar el Saber PRO en Colombia. Simulacros reales, retroalimentación inmediata y reporte de competencias genéricas y específicas. Prueba gratis sin registro.',
+            'keywords' => 'preparación Saber PRO, simulacros Saber PRO, pruebas Saber PRO Colombia, examen Saber PRO, puntaje Saber PRO, competencias genéricas Saber PRO, competencias específicas Saber PRO, cómo aprobar Saber PRO, preparar Saber PRO en línea, plataforma Saber PRO Colombia',
+            'h1' => 'Preparación Saber PRO Colombia: Simulacros Reales y Entrenamiento Inteligente',
+            'canonical' => '/saberpro',
+            'og_image' => '/og-saberpro.jpg',
+            'schema_type' => 'Product',
+            'cta_nav' => 'Preparar Saber PRO',
+        ],
     ];
 
     // Fusion: global + page spécifique

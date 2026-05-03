@@ -267,7 +267,7 @@ class StorageManager {
      */
     private function uploadLocal(string $tmpPath, string $remoteName, string $originalName): string|false {
         
-        $uploadDir = __DIR__ . '/../../uploads/' . dirname($remoteName) . '/';
+        $uploadDir = __DIR__ . '/../uploads/' . dirname($remoteName) . '/';
         
         if (!is_dir($uploadDir)) {
             if (!mkdir($uploadDir, 0755, true)) {

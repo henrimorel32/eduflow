@@ -1,0 +1,160 @@
+---
+# Install Traefik 3.2 avec HTTPS
+
+- name: Install Traefik 3.2
+  hosts: production
+  become: yes
+  become_user: root
+  vars:
+    traefik_dir: /opt/docker/apps/traefik
+
+  tasks:
+    - name: Create directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ traefik_dir }}"
+        - "{{ traefik_dir }}/dynamic"
+        - "{{ traefik_dir }}/letsencrypt"
+
+    - name: Create traefik.yml
+      copy:
+        dest: "{{ traefik_dir }}/traefik.yml"
+        content: |
+          api:
+            dashboard: true
+            insecure: false
+          ping:
+            entryPoint: "traefik"
+          log:
+            level: INFO
+            format: json
+          providers:
+            file:
+              directory: /dynamic
+              watch: true
+            docker:
+              exposedByDefault: false
+              network: edu_proxy
+              watch: true
+          entryPoints:
+            web:
+              address: ':80'
+              http:
+                redirections:
+                  entryPoint:
+                    to: websecure
+                    scheme: https
+                    permanent: true
+            websecure:
+              address: ':443'
+              http:
+                tls:
+                  certResolver: letsencrypt
+                middlewares:
+                  - security-headers@file
+            traefik:
+              address: ':8080'
+          certificatesResolvers:
+            letsencrypt:
+              acme:
+                email: admin@henrimorel.com
+                storage: /letsencrypt/acme.json
+                keyType: RSA4096
+                httpChallenge:
+                  entryPoint: web
+          tls:
+            options:
+              default:
+                minVersion: VersionTLS12
+                cipherSuites:
+                  - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+                  - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+                  - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+
+    - name: Create middlewares.yml
+      copy:
+        dest: "{{ traefik_dir }}/dynamic/middlewares.yml"
+        content: |
+          http:
+            middlewares:
+              security-headers:
+                headers:
+                  frameDeny: true
+                  sslRedirect: true
+                  browserXssFilter: true
+                  contentTypeNosniff: true
+                  forceSTSHeader: true
+                  stsSeconds: 31536000
+                  stsIncludeSubdomains: true
+                  stsPreload: true
+              auth:
+                basicAuth:
+                  users:
+                    - "admin:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
+
+    - name: Create docker-compose.yml
+      copy:
+        dest: "{{ traefik_dir }}/docker-compose.yml"
+        content: |
+          services:
+            traefik:
+              image: traefik:v3.2
+              container_name: traefik
+              restart: unless-stopped
+              ports:
+                - "80:80"
+                - "443:443"
+                - "8080:8080"
+              volumes:
+                - ./traefik.yml:/traefik.yml:ro
+                - ./dynamic:/dynamic:ro
+                - ./letsencrypt:/letsencrypt
+                - /var/run/docker.sock:/var/run/docker.sock:ro
+              networks:
+                - edu_proxy
+              labels:
+                - "traefik.enable=true"
+                - "traefik.http.routers.api.rule=Host(`traefik.henrimorel.com`)"
+                - "traefik.http.routers.api.service=api@internal"
+                - "traefik.http.routers.api.tls=true"
+                - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+                - "traefik.http.routers.api.middlewares=auth@file"
+          networks:
+            edu_proxy:
+              driver: bridge
+              name: edu_proxy
+
+    - name: Create acme.json
+      file:
+        path: "{{ traefik_dir }}/letsencrypt/acme.json"
+        state: touch
+        mode: '0600'
+
+    - name: Start Traefik
+      shell: |
+        cd {{ traefik_dir }} && docker compose up -d
+
+    - name: Wait for start
+      pause:
+        seconds: 5
+
+    - name: Fix permissions for henri
+      file:
+        path: "{{ traefik_dir }}"
+        owner: henri
+        group: henri
+        recurse: yes
+
+    - name: Check logs
+      become: yes
+      become_user: henri
+      shell: |
+        docker logs traefik --tail 10
+      register: logs
+
+    - name: Show logs
+      debug:
+        var: logs.stdout_lines

@@ -1,17 +1,18 @@
 services:
   traefik:
-    image: traefik:v2.10
+    image: traefik:v3.2
     container_name: traefik
     restart: unless-stopped
+    environment:
+      - DOCKER_API_VERSION=1.40
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN:-}
+      - CF_API_EMAIL=${CF_API_EMAIL:-henri@henrimorel.com}
     command:
       - --configFile=/traefik.yml
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"  # Dashboard (sécuriser en prod)
-    environment:
-      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
-      - CF_API_EMAIL=${CF_API_EMAIL:-henri@henrimorel.com}
     volumes:
       - ./traefik.yml:/traefik.yml:ro
       - ./dynamic:/dynamic:ro

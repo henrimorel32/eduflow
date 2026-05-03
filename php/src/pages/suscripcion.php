@@ -44,6 +44,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Détection environnement de développement
+$isDev = (
+    ($_SERVER['HTTP_HOST'] ?? '') === 'localhost'
+    || str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost:')
+    || ($_SERVER['SERVER_NAME'] ?? '') === 'localhost'
+    || (getenv('APP_ENV') === 'dev')
+    || (getenv('APP_ENV') === 'local')
+);
+
 // Configuration des langues
 $idiomas = [
     'es' => ['nombre' => 'Español', 'bandera' => '🇨🇴'],
@@ -162,8 +171,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Upload logo: Pas de fichier ou erreur: " . ($_FILES['logo']['error'] ?? 'no file'));
     }
     
-    // Vérification Turnstile (anti-bot)
-    if (empty($errores)) {
+    // Vérification Turnstile (anti-bot) - désactivée en dev
+    if (empty($errores) && !$isDev) {
         $turnstileToken = $_POST['cf-turnstile-response'] ?? '';
         
         if (empty($turnstileToken)) {
@@ -271,7 +280,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $schoolData['id'] = $schoolId;
             
             // Ajouter à la queue de déploiement (création asynchrone du container)
-            $deployResult = addToDeployQueue($schoolId, $slug, $dockerInfo['subdomain'], $nombre_escuela);
+            $deployResult = addToDeployQueue($schoolId, $slug, $dockerInfo['subdomain'], $nombre_escuela, [
+                'logo_url'       => $logo_url,
+                'favicon_url'    => $favicon_url,
+                'color_primario' => $color_primario,
+                'color_secundario' => $color_secundario
+            ]);
             if ($deployResult['success']) {
                 error_log("✅ École ajoutée à la queue de déploiement: " . ($deployResult['queue_id'] ?? 'N/A'));
             } else {
@@ -361,9 +375,10 @@ try {
 
 /**
  * Ajouter l'école à la queue de déploiement Docker
- * Appel direct à la DB (plus fiable qu'une API HTTP interne)
+ * 1. Insère en DB MySQL
+ * 2. Pousse le job dans Redis via le Queue API
  */
-function addToDeployQueue(int $schoolId, string $slug, string $domain, string $name): array {
+function addToDeployQueue(int $schoolId, string $slug, string $domain, string $name, array $extra = []): array {
     global $pdo;
     
     try {
@@ -379,13 +394,45 @@ function addToDeployQueue(int $schoolId, string $slug, string $domain, string $n
             ];
         }
         
-        // Insérer dans la queue
+        // Insérer dans la queue DB
         $stmt = $pdo->prepare("INSERT INTO school_deploy_queue 
             (school_id, slug, domain, name, status, attempts, created_at) 
             VALUES (?, ?, ?, ?, 'pending', 0, NOW())");
         
         $stmt->execute([$schoolId, $slug, $domain, $name]);
         $queueId = $pdo->lastInsertId();
+        
+        // --- Envoyer le job dans Redis (BullMQ) via le Queue API ---
+        $queueApiUrl = getenv('QUEUE_API_URL') ?: 'http://queue-api:3001/deploy';
+        $payload = array_merge([
+            'school_id' => $schoolId,
+            'slug'      => $slug,
+            'domain'    => $domain,
+            'name'      => $name
+        ], $extra);
+        
+        $opts = [
+            'http' => [
+                'method'  => 'POST',
+                'header'  => "Content-Type: application/json\r\nAccept: application/json",
+                'content' => json_encode($payload),
+                'timeout' => 5
+            ]
+        ];
+        $context = stream_context_create($opts);
+        $queueResponse = @file_get_contents($queueApiUrl, false, $context);
+        
+        if ($queueResponse === false) {
+            error_log("Warning addToDeployQueue: Impossible de contacter le Queue API à $queueApiUrl");
+        } else {
+            $queueResult = json_decode($queueResponse, true);
+            if (!empty($queueResult['success']) && !empty($queueResult['jobId'])) {
+                error_log("✅ Job ajouté à Redis - Job ID: " . $queueResult['jobId']);
+            } else {
+                error_log("Warning addToDeployQueue: Queue API a répondu avec une erreur: " . ($queueResponse ?: 'vide'));
+            }
+        }
+        // -----------------------------------------------------------
         
         return [
             'success' => true,
@@ -844,6 +891,7 @@ $paises_america = [
                             </div>
                         </div>
                         
+                        <?php if (!$isDev): ?>
                         <!-- Widget Turnstile (Cloudflare) -->
                         <div class="flex justify-center">
                             <div class="cf-turnstile" 
@@ -854,10 +902,11 @@ $paises_america = [
                         
                         <!-- Champ caché pour le token -->
                         <input type="hidden" name="cf-turnstile-response" id="cf-turnstile-response">
+                        <?php endif; ?>
                         
                         <button type="submit" id="submitBtn"
-                                class="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center opacity-50 cursor-not-allowed"
-                                disabled>
+                                class="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center <?= $isDev ? '' : 'opacity-50 cursor-not-allowed' ?>"
+                                <?= $isDev ? '' : 'disabled' ?>>
                             <i class="fas fa-magic mr-2"></i>
                             <?= t('boton_crear') ?>
                         </button>
@@ -1239,6 +1288,7 @@ $paises_america = [
                 }, step.delay);
             });
             
+<?php if (!$isDev): ?>
             // Vérifier le token Turnstile avant envoi
             const turnstileToken = document.getElementById('cf-turnstile-response')?.value;
             if (!turnstileToken) {
@@ -1251,11 +1301,12 @@ $paises_america = [
                 return false;
             }
             
-            // Soumettre en AJAX pour garder l'overlay visible
-            const formData = new FormData(this);
-            
             // S'assurer que le token est dans le FormData
+            const formData = new FormData(this);
             formData.set('cf-turnstile-response', turnstileToken);
+<?php else: ?>
+            const formData = new FormData(this);
+<?php endif; ?>
             
             fetch(window.location.href, {
                 method: 'POST',
@@ -1280,6 +1331,7 @@ $paises_america = [
         });
     </script>
     
+    <?php if (!$isDev): ?>
     <!-- Script Cloudflare Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     
@@ -1296,7 +1348,7 @@ $paises_america = [
         
         // Vérifier Turnstile avant soumission
         document.getElementById('suscripcionForm')?.addEventListener('submit', function(e) {
-            const token = document.getElementById('cf-turnstile-response').value;
+            const token = document.getElementById('cf-turnstile-response')?.value || '';
             if (!token) {
                 e.preventDefault();
                 alert('Por favor completa la verificación de seguridad');
@@ -1304,6 +1356,7 @@ $paises_america = [
             }
         });
     </script>
+    <?php endif; ?>
     
 </body>
 </html>

@@ -45,7 +45,7 @@ elseif (!empty($_SERVER['REQUEST_URI'])) {
 $page = preg_replace('/[^a-z0-9_-]/i', '', $page); // Nettoyage
 $page = $page ?: 'home';
 
-$allowed = ['home', 'soluciones', 'contacto', 'icfes','procesar_contacto','inscripcion','suscripcion','check_nombre','check_disponibilidad'];
+$allowed = ['home', 'soluciones', 'contacto', 'icfes', 'aplicaciones', 'saberpro', 'procesar_contacto','inscripcion','suscripcion','check_nombre','check_disponibilidad'];
 if (!in_array($page, $allowed, true)) {
     $page = 'home';
 }

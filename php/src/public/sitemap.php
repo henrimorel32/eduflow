@@ -3,8 +3,12 @@ declare(strict_types=1);
 
 $pages = [
     ['url' => '/', 'priority' => '1.0', 'freq' => 'weekly'],
+    ['url' => '/saberpro', 'priority' => '1.0', 'freq' => 'weekly'],
     ['url' => '/soluciones', 'priority' => '0.9', 'freq' => 'monthly'],
     ['url' => '/icfes', 'priority' => '0.9', 'freq' => 'weekly'],
+    ['url' => '/inscripcion', 'priority' => '0.9', 'freq' => 'weekly'],
+    ['url' => '/suscripcion', 'priority' => '0.9', 'freq' => 'weekly'],
+    ['url' => '/aplicaciones', 'priority' => '0.9', 'freq' => 'weekly'],
     ['url' => '/contacto', 'priority' => '0.7', 'freq' => 'monthly'],
 ];
 

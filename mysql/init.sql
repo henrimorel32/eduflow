@@ -264,5 +264,43 @@ INSERT INTO contenido_web (seccion, clave, valor, idioma) VALUES
 ('suscripcion', 'loading_securite_titre', 'Infrastructure sécurisée', 'fr'),
 ('suscripcion', 'loading_https', 'HTTPS SSL', 'fr'),
 ('suscripcion', 'loading_cloud', 'Cloud OVH', 'fr'),
-('suscripcion', 'loading_bd', 'BD dédiée', 'fr')
+('suscripcion', 'loading_bd', 'BD dédiée', 'fr'),
+
+-- ============================================
+-- APLICACIONES (ES)
+-- ============================================
+('aplicaciones', 'titulo_pagina', 'Nuestras Aplicaciones Educativas | ICFES, Saber, Saber PRO y más - HM', 'es'),
+('aplicaciones', 'titulo_principal', 'Nuestras creaciones y aplicaciones educativas', 'es'),
+('aplicaciones', 'subtitulo', 'Hemos desarrollado plataformas especializadas para que estudiantes y docentes en Colombia se preparen de manera inteligente.', 'es'),
+('aplicaciones', 'cta_principal', 'Empezar entrenamiento gratis', 'es'),
+('aplicaciones', 'label_icfes', 'ICFES', 'es'),
+('aplicaciones', 'desc_icfes', 'El ICFES (ahora Pruebas Saber 11°) es el examen nacional que presentan los estudiantes de grado 11 en Colombia para acceder a la educación superior. Evalúa competencias en lectura crítica, matemáticas, ciencias naturales, ciencias sociales e inglés.', 'es'),
+('aplicaciones', 'label_saber', 'Pruebas Saber', 'es'),
+('aplicaciones', 'desc_saber', 'Las Pruebas Saber son las evaluaciones nacionales de calidad de la educación en Colombia. Los estudiantes de grados 3°, 5° y 9° las presentan para medir sus competencias en lengua castellana, matemáticas, ciencias naturales, ciencias sociales e inglés.', 'es'),
+('aplicaciones', 'label_quierosersaber', 'Quiero Ser / Quiero Saber', 'es'),
+('aplicaciones', 'desc_quierosersaber', 'Es una prueba de orientación vocacional diseñada para estudiantes de último año de bachillerato en Colombia. Ayuda a descubrir qué carreras y profesiones se ajustan mejor a tus intereses, habilidades y personalidad.', 'es'),
+('aplicaciones', 'label_saberpro', 'Saber PRO', 'es'),
+('aplicaciones', 'desc_saberpro', 'Las Pruebas Saber PRO son evaluaciones obligatorias que deben presentar los estudiantes de pregrado antes de graduarse en Colombia. Miden competencias genéricas y específicas según cada carrera.', 'es'),
+('aplicaciones', 'label_docente', 'Concurso Docente', 'es'),
+('aplicaciones', 'desc_docente', 'El Concurso de Méritos para el ingreso a la carrera docente en Colombia es el proceso mediante el cual el Estado selecciona y evalúa a los mejores profesionales de la educación.', 'es'),
+('aplicaciones', 'btn_plataforma', 'Ir a la plataforma', 'es'),
+('aplicaciones', 'btn_probar', 'Probar gratis', 'es'),
+
+-- ============================================
+-- SABERPRO (ES)
+-- ============================================
+('saberpro', 'titulo_pagina', 'Preparación Saber PRO Colombia | Simulacros y Entrenamiento Inteligente — Mente Viva', 'es'),
+('saberpro', 'titulo_principal', 'Prepara tu Saber PRO como un profesional', 'es'),
+('saberpro', 'subtitulo', 'Simulacros reales del examen Saber PRO con retroalimentación inmediata. Más de 3.000 estudiantes colombianos ya confían en nuestra plataforma.', 'es'),
+('saberpro', 'cta_principal', 'Empezar preparación ahora', 'es'),
+('saberpro', 'cta_secundaria', 'Probar gratis sin registro', 'es'),
+('saberpro', 'label_que_es', '¿Qué es el Saber PRO?', 'es'),
+('saberpro', 'desc_que_es', 'El Saber PRO es una evaluación estandarizada diseñada por el ICFES que deben presentar todos los estudiantes de programas de pregrado en Colombia antes de obtener su título profesional.', 'es'),
+('saberpro', 'label_competencias', 'Competencias evaluadas', 'es'),
+('saberpro', 'label_genericas', 'Competencias Genéricas', 'es'),
+('saberpro', 'label_especificas', 'Competencias Específicas', 'es'),
+('saberpro', 'label_metodo', 'Cómo funciona nuestra preparación', 'es'),
+('saberpro', 'label_faq', 'Preguntas frecuentes', 'es'),
+('saberpro', 'btn_plataforma', 'Ir a Saber PRO', 'es'),
+('saberpro', 'btn_probar', 'Probar gratis', 'es')
 ON DUPLICATE KEY UPDATE valor = VALUES(valor);

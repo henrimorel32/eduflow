@@ -55,6 +55,59 @@ services:
       retries: 5
 
   # ============================================================
+  # QUEUE API - Pont PHP vers Redis/BullMQ
+  # ============================================================
+  queue-api:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile
+    container_name: edu_queue_api
+    restart: unless-stopped
+    command: ["node", "queue-api.js"]
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QUEUE_API_PORT: 3001
+    ports:
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - ./scripts:/app:ro
+      - /app/node_modules
+    networks:
+      - edu_internal
+      - edu_network
+    depends_on:
+      - redis
+
+  # ============================================================
+  # WORKER - Traite les jobs de déploiement Docker
+  # ============================================================
+  worker:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile
+    container_name: edu_worker
+    restart: unless-stopped
+    command: ["node", "worker.js"]
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      WORKER_CONCURRENCY: 2
+      APPS_BASE_DIR: /opt/docker/apps
+      UPLOADS_BASE_DIR: /opt/docker/php-uploads
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./scripts:/app
+      - /app/node_modules
+      - ./nextjs-template:/opt/docker/apps/eduflow/nextjs-template:ro
+      - /opt/docker/apps:/opt/docker/apps
+      - ./php/src/uploads:/opt/docker/php-uploads/uploads:ro
+    networks:
+      - edu_internal
+    depends_on:
+      - redis
+
+  # ============================================================
   # ADMINER - Gestion BDD (localhost uniquement)
   # ============================================================
   adminer:
