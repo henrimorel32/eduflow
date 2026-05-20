@@ -6,9 +6,9 @@ $exito = false;
 
 <section class="pt-32 pb-24 bg-gradient-to-br from-primary-600 to-primary-800 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-5xl font-bold mb-6">Contacto</h1>
+        <h1 class="text-5xl font-bold mb-6"><?= t('contacto', 'nav') ?></h1>
         <p class="text-xl text-primary-100 max-w-2xl mx-auto">
-            Estamos aquí para ayudarte a transformar tu colegio
+            <?= t('hero_subtitle', 'contacto') ?>
         </p>
     </div>
 </section>
@@ -19,31 +19,33 @@ $exito = false;
             
             <!-- Info -->
             <div class="scroll-reveal">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6">Hablemos</h2>
+                <h2 class="text-3xl font-bold text-gray-900 mb-6"><?= t('hablemos', 'contacto') ?></h2>
                 <p class="text-gray-600 mb-8 text-lg">
-                    Ya sea que tengas preguntas sobre nuestras soluciones o quieras agendar una demostración, nuestro equipo está listo para ayudarte.
+                    <?= t('intro', 'contacto') ?>
                 </p>
                 
                 <div class="space-y-6">
+                    <?php if (isColombianMarket()): ?>
                     <div class="flex items-start gap-4">
                         <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
                             <i data-lucide="phone" class="w-6 h-6 text-primary-600"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-gray-900">Teléfono</h3>
+                            <h3 class="font-bold text-gray-900"><?= t('telefono', 'contacto') ?></h3>
                             <p class="text-gray-600">+57 320 418 11 93</p>
-                            <p class="text-sm text-gray-500">Lun-Vie: 8am - 6pm</p>
+                            <p class="text-sm text-gray-500"><?= t('horario', 'contacto') ?></p>
                         </div>
                     </div>
+                    <?php endif; ?>
                     
                     <div class="flex items-start gap-4">
                         <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
                             <i data-lucide="mail" class="w-6 h-6 text-primary-600"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-gray-900">Email</h3>
+                            <h3 class="font-bold text-gray-900"><?= t('email', 'contacto') ?></h3>
                             <p class="text-gray-600">henri@henrimorel.com</p>
-                            <p class="text-sm text-gray-500">Respondemos en 24h</p>
+                            <p class="text-sm text-gray-500"><?= t('respuesta_24h', 'contacto') ?></p>
                         </div>
                     </div>
                     
@@ -52,9 +54,9 @@ $exito = false;
                             <i data-lucide="map-pin" class="w-6 h-6 text-primary-600"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-gray-900">Ubicación</h3>
+                            <h3 class="font-bold text-gray-900"><?= t('ubicacion', 'contacto') ?></h3>
                             <p class="text-gray-600">Pereira, Colombia</p>
-                            <p class="text-sm text-gray-500">Atención nacional</p>
+                            <p class="text-sm text-gray-500"><?= t('atencion_nacional', 'contacto') ?></p>
                         </div>
                     </div>
                 </div>
@@ -62,13 +64,13 @@ $exito = false;
 
         <?php if (isset($_GET['status']) && $_GET['status'] === 'ok'): ?>
     <div class="mb-6 p-4 bg-green-100 text-green-700 rounded-xl">
-        ✅ Mensaje enviado correctamente. Te responderemos pronto.
+        ✅ <?= t('mensaje_exito', 'contacto') ?>
     </div>
 <?php endif; ?>
 
 <?php if (isset($_GET['status']) && $_GET['status'] === 'error'): ?>
     <div class="mb-6 p-4 bg-red-100 text-red-700 rounded-xl">
-        ❌ Error al enviar el mensaje.
+        ❌ <?= t('mensaje_error', 'contacto') ?>
     </div>
 <?php endif; ?>
 
@@ -84,37 +86,42 @@ $exito = false;
                 <form id="form-contacto" method="POST" class="space-y-6">
                     <input type="hidden" name="form_type" value="contacto">
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Nombre completo *</label>
+                        <label class="block text-gray-700 font-semibold mb-2"><?= t('label_nombre', 'contacto') ?> *</label>
                         <input type="text" name="nombre" required 
                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition"
-                               placeholder="Tu nombre">
+                               placeholder="<?= t('placeholder_nombre', 'contacto') ?>">
                     </div>
                     
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Correo electrónico *</label>
+                        <label class="block text-gray-700 font-semibold mb-2"><?= t('label_email', 'contacto') ?> *</label>
                         <input type="email" name="email" required 
                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition"
-                               placeholder="tu@email.com">
+                               placeholder="<?= t('placeholder_email', 'contacto') ?>">
                     </div>
                     
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Nombre del colegio</label>
+                        <label class="block text-gray-700 font-semibold mb-2"><?= t('label_colegio', 'contacto') ?></label>
                         <input type="text" name="colegio" 
                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition"
-                               placeholder="Institución Educativa...">
+                               placeholder="<?= t('placeholder_colegio', 'contacto') ?>">
                     </div>
                     
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Mensaje *</label>
+                        <label class="block text-gray-700 font-semibold mb-2"><?= t('label_mensaje', 'contacto') ?> *</label>
                         <textarea name="mensaje" rows="4" required
                                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition"
-                                  placeholder="¿En qué podemos ayudarte?"></textarea>
+                                  placeholder="<?= t('placeholder_mensaje', 'contacto') ?>"></textarea>
                     </div>
                     
-                    <button type="submit" name="enviar_contacto" 
-                            class="w-full py-4 bg-primary-600 text-white rounded-xl font-bold text-lg hover:bg-primary-700 transition shadow-lg hover:shadow-xl"
-                            button.innerText = "Enviando...";>
-                        Enviar Mensaje
+                    <div class="cf-turnstile"
+                         data-sitekey="0x4AAAAAAC1v_HDi1v6nPJoO"
+                         data-callback="onTurnstileSuccess"
+                         data-theme="light"></div>
+                    <input type="hidden" name="cf-turnstile-response" id="cf-turnstile-response">
+
+                    <button type="submit" name="enviar_contacto"
+                            class="w-full py-4 bg-primary-600 text-white rounded-xl font-bold text-lg hover:bg-primary-700 transition shadow-lg hover:shadow-xl">
+                        <?= t('enviar_mensaje', 'contacto') ?>
                         <i data-lucide="send" class="inline-block w-5 h-5 ml-2"></i>
                     </button>
                 </form>
@@ -124,7 +131,14 @@ $exito = false;
     </div>
 </section>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <script>
+function onTurnstileSuccess(token) {
+    const input = document.getElementById('cf-turnstile-response');
+    if (input) input.value = token;
+}
+
 document.getElementById('form-contacto').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -135,7 +149,7 @@ document.getElementById('form-contacto').addEventListener('submit', async functi
     // 💾 Sauvegarde le texte original et ajoute le spinner
     const originalText = button.innerHTML;
     button.disabled = true;
-    button.innerHTML = `<span class="spinner-btn"></span> Enviando...`;
+    button.innerHTML = `<span class="spinner-btn"></span> <?= t('enviando', 'contacto') ?>`;
 
     try {
         const response = await fetch('procesar_contacto', {
@@ -149,7 +163,7 @@ document.getElementById('form-contacto').addEventListener('submit', async functi
         
         // 🟢 SUCCESS
         if (data.exito) {
-            mostrarMensaje("✅ Mensaje enviado correctamente", "success");
+            mostrarMensaje("✅ <?= t('mensaje_exito_corto', 'contacto') ?>", "success");
             form.reset();
         } 
         // 🔴 ERROR
@@ -158,7 +172,7 @@ document.getElementById('form-contacto').addEventListener('submit', async functi
         }
 
     } catch (error) {
-        mostrarMensaje("❌ Error de conexión", "error");
+        mostrarMensaje("❌ <?= t('error_conexion', 'contacto') ?>", "error");
     } finally {
         // 🔄 Restore le bouton dans tous les cas
         button.disabled = false;

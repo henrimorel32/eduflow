@@ -9,41 +9,43 @@
                         </div>
                         <span class="text-lg font-bold text-white">H<span class="text-primary-400">M</span></span>
                     </div>
-                    <p class="text-sm">Optimización de sistemas educativos • Colombia y Latinoamérica</p>
+                    <p class="text-sm"><?= t('optimizacion', 'footer') ?></p>
                 </div>
                 
                 <div>
-                    <h4 class="text-white font-bold mb-4">Soluciones</h4>
+                    <h4 class="text-white font-bold mb-4"><?= t('solutions', 'footer') ?></h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="<?= url('saberpro') ?>" class="hover:text-white transition text-orange-400 font-semibold">⭐ Preparación Saber PRO</a></li>
-                        <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition">Gestión de Admisiones</a></li>
-                        <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition">Comunicación Padres</a></li>
-                        <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition">Seguimiento Académico</a></li>
+                        <li><a href="<?= url('saberpro') ?>" class="hover:text-white transition text-orange-400 font-semibold"><?= t('preparacion_saberpro', 'footer') ?></a></li>
+                        <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition"><?= t('gestion_admisiones', 'footer') ?></a></li>
+                        <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition"><?= t('comunicacion_padres', 'footer') ?></a></li>
+                        <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition"><?= t('seguimiento_academico', 'footer') ?></a></li>
                     </ul>
                 </div>
                 
                 <div>
-                    <h4 class="text-white font-bold mb-4">Enlaces</h4>
+                    <h4 class="text-white font-bold mb-4"><?= t('links', 'footer') ?></h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="<?= url('home') ?>" class="hover:text-white transition">Inicio</a></li>
-                        <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition">Soluciones</a></li>
-                        <li><a href="<?= url('aplicaciones') ?>" class="hover:text-white transition">Nuestras aplicaciones</a></li>
-                        <li><a href="<?= url('saberpro') ?>" class="hover:text-white transition text-orange-400 font-semibold">Preparación Saber PRO</a></li>
-                        <li><a href="<?= url('contacto') ?>" class="hover:text-white transition">Contacto</a></li>
+                        <li><a href="<?= url('home') ?>" class="hover:text-white transition"><?= t('inicio', 'footer') ?></a></li>
+                        <li><a href="<?= url('soluciones') ?>" class="hover:text-white transition"><?= t('soluciones', 'footer') ?></a></li>
+                        <li><a href="<?= url('aplicaciones') ?>" class="hover:text-white transition"><?= t('nuestras_aplicaciones', 'footer') ?></a></li>
+                        <li><a href="<?= url('saberpro') ?>" class="hover:text-white transition text-orange-400 font-semibold"><?= t('preparacion_saberpro_link', 'footer') ?></a></li>
+                        <li><a href="<?= url('contacto') ?>" class="hover:text-white transition"><?= t('contact', 'footer') ?></a></li>
                     </ul>
                 </div>
                 
                 <div>
-                    <h4 class="text-white font-bold mb-4">Contacto</h4>
+                    <h4 class="text-white font-bold mb-4"><?= t('contact', 'footer') ?></h4>
                     <ul class="space-y-2 text-sm">
                         <li class="flex items-center gap-2">
                             <i data-lucide="mail" class="w-4 h-4"></i>
                             henri@henrimorel.com
                         </li>
+                        <?php if (isColombianMarket()): ?>
                         <li class="flex items-center gap-2">
                             <i data-lucide="phone" class="w-4 h-4"></i>
                             +57 320 418 11 93
                         </li>
+                        <?php endif; ?>
                         <li class="flex items-center gap-2">
                             <i data-lucide="map-pin" class="w-4 h-4"></i>
                             Pereira, Colombia
@@ -53,7 +55,7 @@
             </div>
             
             <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-sm">© 2026 HM. Todos los derechos reservados.</p>
+                <p class="text-sm">© <?= date('Y') ?> HM. <?= t('derechos', 'footer') ?></p>
                 <div class="flex gap-4 mt-4 md:mt-0">
                     <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary-600 transition">
                         <i data-lucide="linkedin" class="w-4 h-4"></i>

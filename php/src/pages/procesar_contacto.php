@@ -1,8 +1,11 @@
 <?php
+session_start();
 ob_clean();
 header('Content-Type: application/json');
 // 🔌 Chargement du service mail
 require_once __DIR__ . '/../components/Mailer.php';
+
+$isColombianMarket = ($_SESSION['lang'] ?? 'es') === 'es';
 
 // 🧠 Variables de contrôle
 $errores = [];
@@ -151,6 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 
                     <hr style='margin:25px 0;'>
 
+                    <?php if ($isColombianMarket): ?>
                     <!-- CTA -->
                     <div style='text-align:center; margin:25px 0;'>
                         <a href='https://wa.me/573204181193' 
@@ -158,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
                             💬 Hablar por WhatsApp
                         </a>
                     </div>
+                    <?php endif; ?>
 
                     <p style='font-size:13px; color:#888; text-align:center;'>
                         También puedes responder directamente a este correo.

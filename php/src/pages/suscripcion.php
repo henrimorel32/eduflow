@@ -505,7 +505,7 @@ function enviarEmailConfirmacion(string $email, array $schoolData, array $docker
                 <p style="margin:0 0 10px; color:#166534;"><strong>🚀 ¿Qué has conseguido?</strong></p>
                 <p style="margin:0; color:#15803d; font-size:14px; line-height:1.6;">
                     Has dado el primer paso para <strong>digitalizar completamente tu colegio</strong>. 
-                    Nuestra plataforma no es solo un formulario: es un <strong>sistema integral de gestión escolar</strong> 
+                    Nuestra plataforma no es solo un formulario: es un <strong>sistema integral de aprendizaje SaaS</strong> 
                     que incluye control de matrículas, comunicación con padres, reportes académicos y 
                     herramientas administrativas potentes. Todo <strong>personalizado con los colores de tu institución</strong> 
                     y alojado en servidores seguros de OVH Cloud con certificado SSL.
@@ -522,6 +522,7 @@ function enviarEmailConfirmacion(string $email, array $schoolData, array $docker
                 </ul>
             </div>
             
+            <?php if ($idioma_actual === 'es'): ?>
             <div style="text-align:center; margin:25px 0;">
                 <a href="https://wa.me/573204181193?text=Hola%2C%20acabo%20de%20registrar%20mi%20colegio%20{$schoolData['nombre_escuela']}%20y%20tengo%20preguntas" 
                    style="display:inline-block; background:#25d366; color:white; padding:12px 24px; border-radius:25px; text-decoration:none; font-weight:bold;">
@@ -531,6 +532,7 @@ function enviarEmailConfirmacion(string $email, array $schoolData, array $docker
                     ¿Preguntas? Escríbenos directamente, te respondemos en minutos
                 </p>
             </div>
+            <?php endif; ?>
             
             <hr style="margin:25px 0;">
             
@@ -577,7 +579,7 @@ $paises_america = [
     <!-- SEO Optimisé -->
     <title>Crear Formulario de Inscripción para Colegios | 30 Días Gratis</title>
     <meta name="description" content="Crea tu propio formulario de inscripción escolar personalizado. Página web segura con los colores de tu colegio. Prueba gratuita 30 días. Digitaliza tu proceso de matrícula ahora.">
-    <meta name="keywords" content="formulario inscripción colegio, matrícula escolar digital, sistema inscripción escuela, software inscripción estudiantes, plataforma matrícula colegio, formulario online colegio, inscripción escolar Colombia, gestión matrícula educativa">
+    <meta name="keywords" content="formulario inscripción colegio, matrícula escolar digital, sistema inscripción escuela, plataforma inscripción estudiantes, plataforma matrícula colegio, formulario online colegio, inscripción escolar Colombia, gestión matrícula educativa">
     <meta name="author" content="ESchool">
     <meta name="robots" content="index, follow">
     

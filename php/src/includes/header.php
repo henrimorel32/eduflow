@@ -28,6 +28,7 @@ $seo = getSeoData($currentPage);
 $siteUrl = $seo['site_url'] ?? 'https://hm-edu.co';
 $siteName = $seo['site_name'] ?? 'HM';
 $twitter = $seo['twitter'] ?? '@hm_edu';
+$lang = getLang();
 
 $pageTitle = $pageTitle ?? $seo['title'] ?? 'HM - Software para Colegios';
 $pageDescription = $pageDescription ?? $seo['description'] ?? 'Sistema escuela integral';
@@ -42,7 +43,7 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
 ?>
 
 <!DOCTYPE html>
-<html lang="es-CO" class="scroll-smooth">
+<html lang="<?= $lang === 'es' ? 'es-CO' : ($lang === 'fr' ? 'fr-FR' : 'en-US') ?>" class="scroll-smooth">
 <head>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -67,14 +68,15 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
     <meta name="description" content="<?= e((string)$pageDescription) ?>">
     <meta name="keywords" content="<?= e((string)$pageKeywords) ?>">
     
-    <!-- Canonical & Hreflang (avec variables locales, pas $seo direct) -->
+    <!-- Canonical & Hreflang -->
     <link rel="canonical" href="<?= e((string)$siteUrl) ?><?= e((string)$pageCanonical) ?>">
-    <link rel="alternate" hreflang="es-CO" href="<?= e((string)$siteUrl) ?><?= e((string)$pageCanonical) ?>">
-    <link rel="alternate" hreflang="es" href="<?= e((string)$siteUrl) ?><?= e((string)$pageCanonical) ?>">
-    <link rel="alternate" hreflang="x-default" href="<?= e((string)$siteUrl) ?>">
+    <link rel="alternate" hreflang="es" href="<?= e(urlLang($currentPage, 'es')) ?>">
+    <link rel="alternate" hreflang="en" href="<?= e(urlLang($currentPage, 'en')) ?>">
+    <link rel="alternate" hreflang="fr" href="<?= e(urlLang($currentPage, 'fr')) ?>">
+    <link rel="alternate" hreflang="x-default" href="<?= e(urlLang($currentPage, 'es')) ?>">
     
     <!-- ========== OPEN GRAPH ========== -->
-    <meta property="og:locale" content="es_CO">
+    <meta property="og:locale" content="<?= $lang === 'es' ? 'es_CO' : ($lang === 'fr' ? 'fr_FR' : 'en_US') ?>">
     <meta property="og:type" content="website">
     <meta property="og:title" content="<?= e((string)$pageTitle) ?>">
     <meta property="og:description" content="<?= e((string)$pageDescription) ?>">
@@ -82,11 +84,6 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
     <meta property="og:site_name" content="<?= e((string)$siteName) ?>">
     <meta property="og:image" content="<?= e((string)$siteUrl) ?><?= e((string)$pageOgImage) ?>">
 
-    <!-- Canonical & Hreflang -->
-    <link rel="canonical" href="<?= e($seo['site_url'] . $pageCanonical) ?>">
-    <link rel="alternate" hreflang="es-CO" href="<?= e($seo['site_url'] . $pageCanonical) ?>">
-    <link rel="alternate" hreflang="es" href="<?= e($seo['site_url'] . $pageCanonical) ?>">
-    <link rel="alternate" hreflang="x-default" href="<?= e($seo['site_url']) ?>">
     <!-- ========== FAVICONS ========== -->
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -335,7 +332,7 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
     <!-- End Google Tag Manager (noscript) -->
     <!-- Skip to content (accessibilité) -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-lg">
-        Saltar al contenido principal
+        <?= t('saltar_contenido', 'common') ?>
     </a>
 
     <!-- Navigation ultra-moderne -->
@@ -344,15 +341,17 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
         <div class="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 text-white py-2 px-4 text-center text-sm hidden lg:block">
             <div class="max-w-7xl mx-auto flex items-center justify-center gap-6">
                 <span class="flex items-center gap-2">
-                    <?= pulseBadge('+50 colegios transformados', 'secondary') ?>
+                    <?= pulseBadge(t('colegios_transformados', 'common'), 'secondary') ?>
                 </span>
                 <span class="text-primary-200">|</span>
-                <span class="text-primary-100">Transformación digital para colegios en Colombia</span>
+                <span class="text-primary-100"><?= t('transformacion_digital', 'common') ?></span>
+                <?php if (isColombianMarket()): ?>
                 <span class="text-primary-200">|</span>
                 <a href="tel:+573204181193" class="flex items-center gap-2 hover:text-white transition-colors">
                     <i data-lucide="phone" class="w-4 h-4"></i>
                     +57 320 418 1193
                 </a>
+                <?php endif; ?>
             </div>
         </div>
         
@@ -374,22 +373,22 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                     </div>
                 </a>
                 
-                <!-- Desktop Navigation avec indicateurs visuels -->
+                <!-- Desktop Navigation avec mega-menu -->
                 <div class="hidden lg:flex items-center space-x-1">
                     <a href="<?= url('home') ?>" class="<?= isActive('home') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
-                        Inicio
+                        <?= t('home', 'nav') ?>
                     </a>
                     
                     <a href="<?= url('soluciones') ?>" class="<?= isActive('soluciones') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
-                        Sistema Escuela
+                        <?= t('sistema_escuela', 'nav') ?>
                     </a>
 
                      <a href="<?= url('inscripcion') ?>" class="<?= isActive('inscripcion') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
-                        Demo Inscripción
+                        <?= t('demo_inscripcion', 'nav') ?>
                     </a>
                     
                     <a href="<?= url('suscripcion') ?>" class="<?= isActive('suscripcion') ?> px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 transition-all font-semibold shadow-lg">
-                        🎓 Suscribir Colegio
+                        <?= t('suscribir_colegio', 'nav') ?>
                     </a>
                     
                     <a href="<?= url('saberpro') ?>" class="<?= isActive('saberpro') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2">
@@ -397,45 +396,119 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                         </span>
-                        Preparación Saber PRO
+                        <?= t('preparacion_saberpro', 'nav') ?>
                     </a>
 
-                    <a href="<?= url('icfes') ?>" class="<?= isActive('icfes') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary-500"></span>
-                        </span>
-                        Nuestra plataforma ICFES
-                    </a>
+                    <!-- Mega-menu Applications -->
+                    <div class="relative group" id="apps-menu-desktop">
+                        <button class="<?= isActive('aplicaciones') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2 cursor-pointer" aria-expanded="false" aria-haspopup="true" onclick="toggleAppsMenu()">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+                            </span>
+                            <?= t('nuestras_aplicaciones', 'nav') ?>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        
+                        <!-- Mega-menu dropdown -->
+                        <div id="apps-dropdown" class="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[700px] bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-6">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4"><?= t('titulo', 'catalogo') ?></div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <!-- Col 1: Gestion -->
+                                <div class="space-y-3">
+                                    <div class="text-sm font-bold text-primary-700 flex items-center gap-2">
+                                        <i data-lucide="school" class="w-4 h-4"></i>
+                                        <?= t('gestion_educacion', 'catalogo') ?>
+                                    </div>
+                                    <a href="<?= url('myschoolby') ?>" class="block p-3 rounded-xl hover:bg-primary-50 transition-colors group/item">
+                                        <div class="font-semibold text-gray-900 group-hover/item:text-primary-600 text-sm">MySchoolBy</div>
+                                        <div class="text-xs text-gray-500 mt-1"><?= t('myschoolby_desc', 'catalogo') ?></div>
+                                    </a>
+                                    <div class="space-y-1 pl-2">
+                                        <a href="https://myschoolby.mente-viva.co" target="_blank" class="block text-xs text-gray-600 hover:text-primary-600 flex items-center gap-1">
+                                            <i data-lucide="external-link" class="w-3 h-3"></i> <?= t('portail_prof', 'catalogo') ?>
+                                        </a>
+                                        <a href="https://mente-viva.co/myschoolby" target="_blank" class="block text-xs text-gray-600 hover:text-primary-600 flex items-center gap-1">
+                                            <i data-lucide="external-link" class="w-3 h-3"></i> <?= t('portail_eleve', 'catalogo') ?>
+                                        </a>
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 bg-gray-50 rounded-lg px-2 py-1">
+                                        <?= t('systemes_gestion', 'catalogo') ?>
+                                    </div>
+                                </div>
+                                
+                                <!-- Col 2: Concours -->
+                                <div class="space-y-3">
+                                    <div class="text-sm font-bold text-pink-700 flex items-center gap-2">
+                                        <i data-lucide="award" class="w-4 h-4"></i>
+                                        <?= t('preparation_concours', 'catalogo') ?>
+                                    </div>
+                                    <a href="https://docente.mente-viva.co" target="_blank" class="block p-3 rounded-xl hover:bg-pink-50 transition-colors group/item">
+                                        <div class="font-semibold text-gray-900 group-hover/item:text-pink-600 text-sm"><?= t('concurso_docente', 'catalogo') ?></div>
+                                        <div class="text-xs text-gray-500 mt-1"><?= t('concurso_desc', 'catalogo') ?></div>
+                                    </a>
+                                    <div class="text-[10px] text-green-600 bg-green-50 rounded-lg px-2 py-1 flex items-center gap-1">
+                                        <i data-lucide="gift" class="w-3 h-3"></i> <?= t('incluye_myschoolby', 'catalogo') ?>
+                                    </div>
+                                </div>
+                                
+                                <!-- Col 3: Examens -->
+                                <div class="space-y-3">
+                                    <div class="text-sm font-bold text-orange-700 flex items-center gap-2">
+                                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                                        <?= t('plataformas_examenes', 'catalogo') ?>
+                                    </div>
+                                    <a href="https://saberpro.mente-viva.co" target="_blank" class="block p-2 rounded-lg hover:bg-orange-50 transition-colors">
+                                        <div class="font-semibold text-gray-900 text-xs">Saber PRO</div>
+                                        <div class="text-[10px] text-gray-500"><?= t('saberpro_desc', 'catalogo') ?></div>
+                                    </a>
+                                    <a href="https://mente-viva.co/preicfes" target="_blank" class="block p-2 rounded-lg hover:bg-blue-50 transition-colors">
+                                        <div class="font-semibold text-gray-900 text-xs">Preicfes</div>
+                                        <div class="text-[10px] text-gray-500"><?= t('preicfes_desc', 'catalogo') ?></div>
+                                    </a>
+                                    <a href="https://mente-viva.co/saber" target="_blank" class="block p-2 rounded-lg hover:bg-green-50 transition-colors">
+                                        <div class="font-semibold text-gray-900 text-xs">Saber</div>
+                                        <div class="text-[10px] text-gray-500"><?= t('saber_desc', 'catalogo') ?></div>
+                                    </a>
+                                    <a href="https://mente-viva.co/quierosersaber" target="_blank" class="block p-2 rounded-lg hover:bg-purple-50 transition-colors">
+                                        <div class="font-semibold text-gray-900 text-xs">Quiero Ser / Saber</div>
+                                        <div class="text-[10px] text-gray-500"><?= t('quierosersaber_desc', 'catalogo') ?></div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-100 text-center">
+                                <a href="<?= url('aplicaciones') ?>" class="text-sm text-primary-600 hover:text-primary-700 font-semibold inline-flex items-center gap-1">
+                                    <?= t('ver_mas', 'common') ?> <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
-                    <a href="<?= url('aplicaciones') ?>" class="<?= isActive('aplicaciones') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
-                        </span>
-                        Nuestras aplicaciones
+                    <a href="<?= url('contacto') ?>" class="<?= isActive('contacto') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
+                        <?= t('contacto', 'nav') ?>
                     </a>
-
-                      <a href="<?= url('contacto') ?>" class="<?= isActive('contacto') ?> px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
-                        Contacto
-                    </a>
-                    
-                    <!-- <a href="<?= url('home') ?>#testimonios" class="text-gray-600 hover:text-primary-600 px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
-                        Casos de Éxito
-                    </a> -->
                 </div>
                 
-                <!-- CTA Principal - Bouton marketing -->
-                <div class="hidden lg:flex items-center gap-4">
-                   <a href="https://wa.me/573204181193?text=Hola%20quiero%20informaci%C3%B3n%20sobre%20la%20plataforma" 
+                <!-- CTA Principal + Langue -->
+                <div class="hidden lg:flex items-center gap-3">
+                    <!-- Sélecteur de langue -->
+                    <div class="flex items-center gap-1 bg-gray-100 rounded-full px-1 py-1">
+                        <a href="?lang=es" class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold <?= $lang === 'es' ? 'bg-white shadow text-primary-700' : 'text-gray-500 hover:text-gray-700' ?>" title="Español">ES</a>
+                        <a href="?lang=en" class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold <?= $lang === 'en' ? 'bg-white shadow text-primary-700' : 'text-gray-500 hover:text-gray-700' ?>" title="English">EN</a>
+                        <a href="?lang=fr" class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold <?= $lang === 'fr' ? 'bg-white shadow text-primary-700' : 'text-gray-500 hover:text-gray-700' ?>" title="Français">FR</a>
+                    </div>
+                    
+                    <?php if (isColombianMarket()): ?>
+                    <a href="https://wa.me/573204181193?text=Hola%20quiero%20informaci%C3%B3n%20sobre%20la%20plataforma" 
                         target="_blank"
                         class="text-gray-600 hover:text-primary-600 transition-colors flex items-center gap-2 text-sm font-medium">
                             <i data-lucide="headphones" class="w-4 h-4"></i>
-                            Soporte
-                        </a>
+                            <?= t('soporte', 'nav') ?>
+                    </a>
+                    <?php endif; ?>
                     
                     <a href="<?= url('home') ?>#diagnostico" class="btn-magnetic btn-shine group relative px-6 py-3 bg-gradient-to-r from-primary-600 via-primary-500 to-secondary-500 text-white rounded-full font-semibold shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 transition-all flex items-center gap-2 overflow-hidden">
-                        <span class="relative z-10"><?= e($seo['cta_nav']) ?></span>
+                        <span class="relative z-10"><?= e($ctaNav) ?></span>
                         <i data-lucide="arrow-right" class="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform"></i>
                     </a>
                 </div>
@@ -458,14 +531,14 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                     </button>
                 </div>
                 
-                <!-- Links -->
+                <!-- Links Mobile -->
                 <a href="<?= url('home') ?>" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition-all group">
                     <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition-colors">
                         <i data-lucide="home" class="w-5 h-5 text-primary-600"></i>
                     </div>
                     <div>
-                        <span class="font-semibold block">Inicio</span>
-                        <span class="text-xs text-gray-500">Software para colegios</span>
+                        <span class="font-semibold block"><?= t('home', 'nav') ?></span>
+                        <span class="text-xs text-gray-500"><?= t('software_colegios', 'nav') ?></span>
                     </div>
                 </a>
                 
@@ -474,8 +547,8 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                         <i data-lucide="layout-grid" class="w-5 h-5 text-primary-600"></i>
                     </div>
                     <div>
-                        <span class="font-semibold block">Sistema Escuela</span>
-                        <span class="text-xs text-gray-500">Todas las funcionalidades</span>
+                        <span class="font-semibold block"><?= t('sistema_escuela', 'nav') ?></span>
+                        <span class="text-xs text-gray-500"><?= t('todas_funcionalidades', 'nav') ?></span>
                     </div>
                 </a>
                 
@@ -484,10 +557,10 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                         <i data-lucide="briefcase" class="w-5 h-5 text-orange-600"></i>
                     </div>
                     <div>
-                        <span class="font-semibold block">Preparación Saber PRO</span>
-                        <span class="text-xs text-gray-500">Simulacros reales</span>
+                        <span class="font-semibold block"><?= t('preparacion_saberpro', 'nav') ?></span>
+                        <span class="text-xs text-gray-500"><?= t('simulacros_reales', 'nav') ?></span>
                     </div>
-                    <span class="ml-auto px-2 py-1 bg-orange-500 text-white text-xs rounded-full font-bold">TOP</span>
+                    <span class="ml-auto px-2 py-1 bg-orange-500 text-white text-xs rounded-full font-bold"><?= t('top', 'common') ?></span>
                 </a>
 
                 <a href="<?= url('icfes') ?>" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary-50 text-gray-700 hover:text-secondary-600 transition-all group">
@@ -495,43 +568,72 @@ $ctaNav = $seo['cta_nav'] ?? 'Diagnóstico Gratis';
                         <i data-lucide="brain" class="w-5 h-5 text-secondary-600"></i>
                     </div>
                     <div>
-                        <span class="font-semibold block">Preparación ICFES</span>
-                        <span class="text-xs text-gray-500">IA adaptativa</span>
+                        <span class="font-semibold block"><?= t('plataforma_icfes', 'nav') ?></span>
+                        <span class="text-xs text-gray-500"><?= t('ia_adaptativa', 'nav') ?></span>
                     </div>
-                    <span class="ml-auto px-2 py-1 bg-secondary-500 text-white text-xs rounded-full font-bold">NUEVO</span>
+                    <span class="ml-auto px-2 py-1 bg-secondary-500 text-white text-xs rounded-full font-bold"><?= t('nuevo', 'common') ?></span>
                 </a>
 
-                <a href="<?= url('aplicaciones') ?>" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-50 text-gray-700 hover:text-purple-600 transition-all group">
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                        <i data-lucide="layout-grid" class="w-5 h-5 text-purple-600"></i>
+                <!-- Mobile Apps Section -->
+                <div class="px-4 py-3 rounded-xl bg-purple-50 border border-purple-100">
+                    <div class="font-semibold text-purple-700 mb-2 flex items-center gap-2">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                        <?= t('nuestras_aplicaciones', 'nav') ?>
                     </div>
-                    <div>
-                        <span class="font-semibold block">Nuestras aplicaciones</span>
-                        <span class="text-xs text-gray-500">Todas nuestras plataformas</span>
+                    <div class="space-y-2 pl-2">
+                        <a href="<?= url('myschoolby') ?>" class="block text-sm text-gray-700 hover:text-primary-600 py-1">
+                            <span class="font-medium">MySchoolBy</span> — <?= t('gestion_educacion', 'catalogo') ?>
+                        </a>
+                        <a href="https://docente.mente-viva.co" target="_blank" class="block text-sm text-gray-700 hover:text-pink-600 py-1">
+                            <span class="font-medium"><?= t('concurso_docente', 'catalogo') ?></span>
+                        </a>
+                        <a href="https://saberpro.mente-viva.co" target="_blank" class="block text-sm text-gray-700 hover:text-orange-600 py-1">
+                            <span class="font-medium">Saber PRO</span>
+                        </a>
+                        <a href="https://mente-viva.co/preicfes" target="_blank" class="block text-sm text-gray-700 hover:text-blue-600 py-1">
+                            <span class="font-medium">Preicfes</span>
+                        </a>
+                        <a href="https://mente-viva.co/saber" target="_blank" class="block text-sm text-gray-700 hover:text-green-600 py-1">
+                            <span class="font-medium">Saber</span>
+                        </a>
+                        <a href="https://mente-viva.co/quierosersaber" target="_blank" class="block text-sm text-gray-700 hover:text-purple-600 py-1">
+                            <span class="font-medium">Quiero Ser / Saber</span>
+                        </a>
                     </div>
-                    <span class="ml-auto px-2 py-1 bg-purple-500 text-white text-xs rounded-full font-bold">NUEVO</span>
-                </a>
+                </div>
                 
                 <a href="<?= url('suscripcion') ?>" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 text-gray-700 hover:text-orange-700 transition-all group border-2 border-yellow-400">
                     <div class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center shadow-lg">
                         <span class="text-xl">🎓</span>
                     </div>
                     <div>
-                        <span class="font-semibold block">Suscribir Colegio</span>
-                        <span class="text-xs text-gray-500">Crea tu página de inscripción</span>
+                        <span class="font-semibold block"><?= t('suscribir_colegio', 'nav') ?></span>
+                        <span class="text-xs text-gray-500"><?= t('crea_pagina', 'nav') ?></span>
                     </div>
-                    <span class="ml-auto px-2 py-1 bg-orange-500 text-white text-xs rounded-full font-bold">GRATIS</span>
+                    <span class="ml-auto px-2 py-1 bg-orange-500 text-white text-xs rounded-full font-bold"><?= t('gratis', 'common') ?></span>
                 </a>
+                
+                <!-- Langue mobile -->
+                <div class="pt-4 border-t border-gray-100">
+                    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-4">Idioma / Language / Langue</div>
+                    <div class="flex gap-2 px-4">
+                        <a href="?lang=es" class="flex-1 py-2 rounded-lg text-center text-sm font-semibold <?= $lang === 'es' ? 'bg-primary-100 text-primary-700' : 'bg-gray-50 text-gray-600' ?>">🇪🇸 Español</a>
+                        <a href="?lang=en" class="flex-1 py-2 rounded-lg text-center text-sm font-semibold <?= $lang === 'en' ? 'bg-primary-100 text-primary-700' : 'bg-gray-50 text-gray-600' ?>">🇬🇧 English</a>
+                        <a href="?lang=fr" class="flex-1 py-2 rounded-lg text-center text-sm font-semibold <?= $lang === 'fr' ? 'bg-primary-100 text-primary-700' : 'bg-gray-50 text-gray-600' ?>">🇫🇷 Français</a>
+                    </div>
+                </div>
                 
                 <!-- Contact info mobile -->
                 <div class="pt-4 border-t border-gray-100 space-y-3">
+                    <?php if (isColombianMarket()): ?>
                     <a href="tel:+573204181193" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 text-gray-700 transition-all">
                         <i data-lucide="phone" class="w-5 h-5 text-primary-600"></i>
                         <span class="font-medium">+57 320 418 1193</span>
                     </a>
+                    <?php endif; ?>
                     
                     <a href="<?= url('home') ?>#contacto" class="block w-full px-6 py-4 bg-gradient-to-r from-primary-600 to-secondary-500 text-white rounded-xl font-bold text-center shadow-lg">
-                        <?= e($seo['cta_nav']) ?>
+                        <?= e($ctaNav) ?>
                     </a>
                 </div>
             </div>

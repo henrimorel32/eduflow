@@ -2,9 +2,9 @@
 declare(strict_types=1);
 
 // SEO optimisé pour consultoría en optimización de sistemas
-$pageTitle = 'Optimización de Sistemas Educativos Colombia | Consultoría TI para Escuela';
-$pageDescription = 'Deja de comprar software. Optimiza lo que ya tienes. Consultoría especializada en escuela: auditoría de sistemas, eliminación de duplicados, SSO e integración de aplicaciones. +50 escuelas en Colombia y Latinoamérica.';
-$pageH1 = 'Consultoría en Optimización de Sistemas Educativos';
+$pageTitle = t('title', 'seo.home');
+$pageDescription = t('description', 'seo.home');
+$pageH1 = t('h1', 'seo.home');
 
 // Contenu dynamique
 $contenido = [];
@@ -17,7 +17,7 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
   async
   defer
 ></script>
-<!-- HERO SECTION - Posicionamiento claro: NO vendemos software -->
+<!-- HERO SECTION - Posicionamiento: Ecosistema educativo SaaS para el aprendizaje -->
 <section class="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-br from-gray-50 to-white">
     <!-- Elementos decorativos sutiles -->
     <div class="absolute top-0 right-0 w-1/2 h-full bg-primary-50/30 -skew-x-12 transform origin-top-right"></div>
@@ -29,29 +29,27 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                 <!-- Badge de posicionamiento -->
                 <div class="inline-flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-full text-sm font-bold mb-6 border border-red-100">
                     <i data-lucide="alert-circle" class="w-4 h-4 mr-2"></i>
-                    No vendemos software. Optimizamos el que ya tienes.
+                    <?= t('hero_badge', 'home') ?>
                 </div>
                 
                 <!-- H1 principal -->
                 <h1 class="text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-gray-900">
-                    Tu Escuela Ya Tiene las Herramientas.<br>
-                    <span class="text-primary-600">Falta Que Hablen Entre Ellas.</span>
+                    <?= t('hero_h1_l1', 'home') ?><br>
+                    <span class="text-primary-600"><?= t('hero_h1_l2', 'home') ?></span>
                 </h1>
                 
                 <!-- Subtítulo explicativo -->
                 <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-                    Consultoría especializada en <strong>auditoría y optimización de sistemas de información</strong> 
-                    para instituciones educativas. Detectamos duplicados, integramos aplicaciones, 
-                    implementamos <strong>SSO</strong> y hacemos fluir la información sin comprar más licencias.
+                    <?= t('hero_subtitle', 'home') ?>
                 </p>
                 
                 <!-- CTAs -->
                 <div class="flex flex-col sm:flex-row gap-4">
                     <a href="#diagnostico" class="pulse-ring px-8 py-4 bg-primary-600 text-white rounded-full font-bold text-lg text-center hover:bg-primary-700 transition shadow-lg hover:shadow-xl">
-                        Diagnóstico Gratuito del Sistema
+                        <?= t('cta_diagnostico', 'home') ?>
                     </a>
                     <a href="#metodologia" class="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-full font-bold text-lg text-center hover:border-primary-600 hover:text-primary-600 transition">
-                        Cómo Trabajamos
+                        <?= t('cta_como_trabajamos', 'home') ?>
                     </a>
                 </div>
                 
@@ -59,15 +57,15 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                 <div class="mt-10 flex flex-wrap items-center gap-6 text-sm text-gray-500">
                     <div class="flex items-center gap-2">
                         <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
-                        <span>Sin nuevas licencias</span>
+                        <span><?= t('sin_licencias', 'home') ?></span>
                     </div>
                     <div class="flex items-center gap-2">
                         <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
-                        <span>+50 escuelas optimizadas</span>
+                        <span><?= t('escuelas_optimizadas', 'home') ?></span>
                     </div>
                     <div class="flex items-center gap-2">
                         <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
-                        <span>Colombia y Latinoamérica</span>
+                        <span><?= t('colombia_latam', 'home') ?></span>
                     </div>
                 </div>
             </div>
@@ -83,8 +81,8 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                                     <i data-lucide="file-spreadsheet" class="w-5 h-5 text-red-600"></i>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-800">Excel de Notas</p>
-                                    <p class="text-xs text-red-600">Desactualizado</p>
+                                    <p class="font-semibold text-gray-800"><?= t('excel_notas', 'home') ?></p>
+                                    <p class="text-xs text-red-600"><?= t('excel_notas_status', 'home') ?></p>
                                 </div>
                             </div>
                             <i data-lucide="x" class="w-5 h-5 text-red-500"></i>
@@ -96,8 +94,8 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                                     <i data-lucide="database" class="w-5 h-5 text-red-600"></i>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-800">Base de Datos Matrículas</p>
-                                    <p class="text-xs text-red-600">Información duplicada</p>
+                                    <p class="font-semibold text-gray-800"><?= t('bd_matriculas', 'home') ?></p>
+                                    <p class="text-xs text-red-600"><?= t('bd_matriculas_status', 'home') ?></p>
                                 </div>
                             </div>
                             <i data-lucide="x" class="w-5 h-5 text-red-500"></i>
@@ -109,8 +107,8 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                                     <i data-lucide="message-circle" class="w-5 h-5 text-red-600"></i>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-800">App de Comunicación</p>
-                                    <p class="text-xs text-red-600">Desconectada del resto</p>
+                                    <p class="font-semibold text-gray-800"><?= t('app_comunicacion', 'home') ?></p>
+                                    <p class="text-xs text-red-600"><?= t('app_comunicacion_status', 'home') ?></p>
                                 </div>
                             </div>
                             <i data-lucide="x" class="w-5 h-5 text-red-500"></i>
@@ -130,8 +128,8 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                                     <i data-lucide="network" class="w-5 h-5 text-green-600"></i>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-800">Sistema Integrado vía SSO</p>
-                                    <p class="text-xs text-green-600">Datos sincronizados en tiempo real</p>
+                                    <p class="font-semibold text-gray-800"><?= t('sistema_integrado', 'home') ?></p>
+                                    <p class="text-xs text-green-600"><?= t('sistema_integrado_status', 'home') ?></p>
                                 </div>
                             </div>
                             <i data-lucide="check" class="w-5 h-5 text-green-500"></i>
@@ -146,7 +144,7 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                             </div>
                             <div>
                                 <p class="text-2xl font-bold text-gray-900">-40%</p>
-                                <p class="text-xs text-gray-500">en costos de TI</p>
+                                <p class="text-xs text-gray-500"><?= t('costos_ti', 'home') ?></p>
                             </div>
                         </div>
                     </div>
@@ -160,14 +158,12 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
 <section id="problema" class="py-24 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 scroll-reveal">
-            <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider">El Problema Real</span>
+            <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider"><?= t('problema_label', 'home') ?></span>
             <h2 class="text-4xl font-bold text-gray-900 mt-4 mb-6">
-                ¿Por Qué Seguir Comprando Software<br>Cuando el Problema es la <span class="text-red-500">Desorganización</span>?
+                <?= t('problema_h2_l1', 'home') ?><br><?= t('problema_h2_l2', 'home') ?>
             </h2>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                La mayoría de las escuelas en Colombia y Latinoamérica <strong>ya tienen las herramientas</strong>. 
-                Lo que no tienen es una estrategia de integración. Resultado: duplicidad de datos, 
-                inseguridad y desperdicio de dinero.
+                <?= t('problema_intro', 'home') ?>
             </p>
         </div>
         
@@ -177,14 +173,13 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                 <div class="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mb-6">
                     <i data-lucide="copy" class="w-7 h-7 text-red-600"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-3 text-gray-900">Duplicidad de Información</h3>
+                <h3 class="text-xl font-bold mb-3 text-gray-900"><?= t('problema_1_title', 'home') ?></h3>
                 <p class="text-gray-600 mb-4">
-                    La misma base de estudiantes en 4 sistemas diferentes. Cada cambio se debe hacer manualmente 
-                    en cada plataforma.
+                    <?= t('problema_1_desc', 'home') ?>
                 </p>
                 <div class="bg-red-50 p-3 rounded-lg text-sm text-red-700 font-semibold">
                     <i data-lucide="alert-triangle" class="w-4 h-4 inline mr-1"></i>
-                    Error humano garantizado
+                    <?= t('problema_1_alert', 'home') ?>
                 </div>
             </div>
             
@@ -193,14 +188,13 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                 <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mb-6">
                     <i data-lucide="key" class="w-7 h-7 text-orange-600"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-3 text-gray-900">Múltiples Contraseñas</h3>
+                <h3 class="text-xl font-bold mb-3 text-gray-900"><?= t('problema_2_title', 'home') ?></h3>
                 <p class="text-gray-600 mb-4">
-                    Profesores con 5 usuarios diferentes. Padres que olvidan qué app usar para qué. 
-                    Administrativos con accesos dispersos.
+                    <?= t('problema_2_desc', 'home') ?>
                 </p>
                 <div class="bg-orange-50 p-3 rounded-lg text-sm text-orange-700 font-semibold">
                     <i data-lucide="shield-alert" class="w-4 h-4 inline mr-1"></i>
-                    Riesgo de seguridad alto
+                    <?= t('problema_2_alert', 'home') ?>
                 </div>
             </div>
             
@@ -209,14 +203,13 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                 <div class="w-14 h-14 bg-yellow-100 rounded-xl flex items-center justify-center mb-6">
                     <i data-lucide="credit-card" class="w-7 h-7 text-yellow-600"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-3 text-gray-900">Sobrecosto de Licencias</h3>
+                <h3 class="text-xl font-bold mb-3 text-gray-900"><?= t('problema_3_title', 'home') ?></h3>
                 <p class="text-gray-600 mb-4">
-                    Pagando 3 herramientas que hacen lo mismo. Software abandonado que sigue facturando. 
-                    Contratos auto-renovables olvidados.
+                    <?= t('problema_3_desc', 'home') ?>
                 </p>
                 <div class="bg-yellow-50 p-3 rounded-lg text-sm text-yellow-700 font-semibold">
                     <i data-lucide="dollar-sign" class="w-4 h-4 inline mr-1"></i>
-                    30% del presupuesto de TI desperdiciado
+                    <?= t('problema_3_alert', 'home') ?>
                 </div>
             </div>
         </div>
@@ -224,11 +217,10 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
         <!-- Insight principal -->
         <div class="mt-16 bg-primary-900 rounded-3xl p-8 md:p-12 text-center text-white scroll-reveal">
             <h3 class="text-2xl md:text-3xl font-bold mb-4">
-                "Todo está ahí, pero mal organizado"
+                <?= t('insight_quote', 'home') ?>
             </h3>
             <p class="text-primary-100 text-lg max-w-2xl mx-auto">
-                Esa frase la escuchamos en el 80% de las escuelas que atendemos. 
-                No necesitas más tecnología. Necesitas <strong>arquitectura de información</strong>.
+                <?= t('insight_text', 'home') ?>
             </p>
         </div>
     </div>
@@ -238,10 +230,10 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
 <section id="metodologia" class="py-24 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 scroll-reveal">
-            <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider">Nuestra Metodología</span>
+            <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider"><?= t('metodologia_label', 'home') ?></span>
             <h2 class="text-4xl font-bold text-gray-900 mt-4 mb-6">
-                De la Auditoría a la Optimización:<br>
-                <span class="text-primary-600">Sin Comprar Nada Nuevo</span>
+                <?= t('metodologia_h2_l1', 'home') ?><br>
+                <span class="text-primary-600"><?= t('metodologia_h2_l2', 'home') ?></span>
             </h2>
         </div>
         
@@ -256,23 +248,22 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                     <div class="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 mx-auto border-4 border-white shadow-md">
                         1
                     </div>
-                    <h3 class="text-lg font-bold text-center mb-3">Auditoría Completa</h3>
+                    <h3 class="text-lg font-bold text-center mb-3"><?= t('paso_1_title', 'home') ?></h3>
                     <p class="text-gray-600 text-center text-sm">
-                        Mapeamos <strong>todo</strong> el sistema de información actual: aplicaciones, 
-                        bases de datos, usuarios y costos ocultos.
+                        <?= t('paso_1_desc', 'home') ?>
                     </p>
                     <ul class="mt-4 space-y-2 text-sm text-gray-500">
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Inventario de software
+                            <?= t('paso_1_list_1', 'home') ?>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Análisis de duplicados
+                            <?= t('paso_1_list_2', 'home') ?>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Mapeo de costos
+                            <?= t('paso_1_list_3', 'home') ?>
                         </li>
                     </ul>
                 </div>
@@ -282,23 +273,22 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                     <div class="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 mx-auto border-4 border-white shadow-md">
                         2
                     </div>
-                    <h3 class="text-lg font-bold text-center mb-3">Diagnóstico de Integración</h3>
+                    <h3 class="text-lg font-bold text-center mb-3"><?= t('paso_2_title', 'home') ?></h3>
                     <p class="text-gray-600 text-center text-sm">
-                        Identificamos qué sistemas pueden hablar entre sí, dónde están los cuellos de botella 
-                        y qué datos se pierden.
+                        <?= t('paso_2_desc', 'home') ?>
                     </p>
                     <ul class="mt-4 space-y-2 text-sm text-gray-500">
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            APIs disponibles
+                            <?= t('paso_2_list_1', 'home') ?>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Flujos de datos
+                            <?= t('paso_2_list_2', 'home') ?>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Puntos de fricción
+                            <?= t('paso_2_list_3', 'home') ?>
                         </li>
                     </ul>
                 </div>
@@ -308,23 +298,22 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                     <div class="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 mx-auto border-4 border-white shadow-md">
                         3
                     </div>
-                    <h3 class="text-lg font-bold text-center mb-3">Implementación SSO</h3>
+                    <h3 class="text-lg font-bold text-center mb-3"><?= t('paso_3_title', 'home') ?></h3>
                     <p class="text-gray-600 text-center text-sm">
-                        Unificamos el acceso mediante <strong>Single Sign-On</strong>. Un solo usuario, 
-                        un solo password, todas las aplicaciones.
+                        <?= t('paso_3_desc', 'home') ?>
                     </p>
                     <ul class="mt-4 space-y-2 text-sm text-gray-500">
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Autenticación centralizada
+                            <?= t('paso_3_list_1', 'home') ?>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Gestión de permisos
+                            <?= t('paso_3_list_2', 'home') ?>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Seguridad reforzada
+                            <?= t('paso_3_list_3', 'home') ?>
                         </li>
                     </ul>
                 </div>
@@ -334,23 +323,22 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                     <div class="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 mx-auto border-4 border-white shadow-md">
                         4
                     </div>
-                    <h3 class="text-lg font-bold text-center mb-3">Integración y Limpieza</h3>
+                    <h3 class="text-lg font-bold text-center mb-3"><?= t('paso_4_title', 'home') ?></h3>
                     <p class="text-gray-600 text-center text-sm">
-                        Conectamos las aplicaciones existentes, eliminamos duplicados y establecemos 
-                        flujos automáticos de información.
+                        <?= t('paso_4_desc', 'home') ?>
                     </p>
                     <ul class="mt-4 space-y-2 text-sm text-gray-500">
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Sincronización de datos
+                            <?= t('paso_4_list_1', 'home') ?>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Eliminación de redundancias
+                            <?= t('paso_4_list_2', 'home') ?>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
-                            Automatización de procesos
+                            <?= t('paso_4_list_3', 'home') ?>
                         </li>
                     </ul>
                 </div>
@@ -361,24 +349,22 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
         <div class="mt-16 bg-white rounded-3xl p-8 shadow-xl border border-gray-100 scroll-reveal">
             <div class="grid md:grid-cols-2 gap-8 items-center">
                 <div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Resultado: Un Sistema que Funciona Como Uno Solo</h3>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4"><?= t('resultado_title', 'home') ?></h3>
                     <p class="text-gray-600 mb-6">
-                        No implementamos software nuevo. <strong>Optimizamos tu inversión existente</strong>. 
-                        Tus aplicaciones actuales, pero hablando entre ellas, sin duplicados, con acceso único 
-                        y costos reducidos.
+                        <?= t('resultado_desc', 'home') ?>
                     </p>
                     <div class="flex flex-wrap gap-3">
                         <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
                             <i data-lucide="check-circle" class="w-4 h-4 inline mr-1"></i>
-                            Sin nuevas licencias
+                            <?= t('sin_nuevas_licencias', 'home') ?>
                         </span>
                         <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
                             <i data-lucide="check-circle" class="w-4 h-4 inline mr-1"></i>
-                            Menos errores humanos
+                            <?= t('menos_errores', 'home') ?>
                         </span>
                         <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
                             <i data-lucide="check-circle" class="w-4 h-4 inline mr-1"></i>
-                            Mayor seguridad
+                            <?= t('mayor_seguridad', 'home') ?>
                         </span>
                     </div>
                 </div>
@@ -386,20 +372,20 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                     <h4 class="font-bold text-gray-900 mb-4">Lo que eliminamos vs Lo que optimizamos</h4>
                     <div class="space-y-3">
                         <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                            <span class="text-sm text-gray-700">Duplicidad de datos</span>
-                            <span class="text-red-600 font-bold text-sm">ELIMINADO</span>
+                            <span class="text-sm text-gray-700"><?= t('problema_1_title', 'home') ?></span>
+                            <span class="text-red-600 font-bold text-sm"><?= t('eliminado', 'home') ?></span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                            <span class="text-sm text-gray-700">Múltiples passwords</span>
-                            <span class="text-red-600 font-bold text-sm">ELIMINADO</span>
+                            <span class="text-sm text-gray-700"><?= t('problema_2_title', 'home') ?></span>
+                            <span class="text-red-600 font-bold text-sm"><?= t('eliminado', 'home') ?></span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                            <span class="text-sm text-gray-700">Licencias redundantes</span>
-                            <span class="text-red-600 font-bold text-sm">CANCELADAS</span>
+                            <span class="text-sm text-gray-700"><?= t('problema_3_title', 'home') ?></span>
+                            <span class="text-red-600 font-bold text-sm"><?= t('canceladas', 'home') ?></span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                             <span class="text-sm text-gray-700">Aplicaciones existentes</span>
-                            <span class="text-green-600 font-bold text-sm">INTEGRADAS</span>
+                            <span class="text-green-600 font-bold text-sm"><?= t('integradas', 'home') ?></span>
                         </div>
                     </div>
                 </div>
@@ -412,9 +398,9 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
 <section id="servicios" class="py-24 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 scroll-reveal">
-            <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider">Servicios Especializados</span>
+            <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider"><?= t('servicios_label', 'home') ?></span>
             <h2 class="text-4xl font-bold text-gray-900 mt-4 mb-6">
-                Optimización Real, No Más Software
+                <?= t('servicios_h2', 'home') ?>
             </h2>
         </div>
         
@@ -424,13 +410,12 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                 <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <i data-lucide="search" class="w-7 h-7 text-blue-600"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-3">Auditoría de Arquitectura de Datos</h3>
+                <h3 class="text-xl font-bold mb-3"><?= t('servicio_1_title', 'home') ?></h3>
                 <p class="text-gray-600 mb-4">
-                    Análisis exhaustivo de cómo fluye la información en tu institución. Detectamos 
-                    silos de datos, inconsistencias y oportunidades de integración.
+                    <?= t('servicio_1_desc', 'home') ?>
                 </p>
                 <div class="flex items-center text-primary-600 font-semibold text-sm">
-                    <span>Entregable: Mapa de sistemas y flujos de datos</span>
+                    <span><?= t('servicio_1_entregable', 'home') ?></span>
                     <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
                 </div>
             </div>
@@ -440,13 +425,12 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                 <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <i data-lucide="link" class="w-7 h-7 text-purple-600"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-3">Integración de Aplicaciones (APIs)</h3>
+                <h3 class="text-xl font-bold mb-3"><?= t('servicio_2_title', 'home') ?></h3>
                 <p class="text-gray-600 mb-4">
-                    Conectamos tus sistemas existentes mediante APIs. SGA, financiero, comunicaciones 
-                    y plataformas de pago trabajando como uno solo.
+                    <?= t('servicio_2_desc', 'home') ?>
                 </p>
                 <div class="flex items-center text-primary-600 font-semibold text-sm">
-                    <span>Entregable: Sistemas sincronizados en tiempo real</span>
+                    <span><?= t('servicio_2_entregable', 'home') ?></span>
                     <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
                 </div>
             </div>
@@ -456,13 +440,12 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                 <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <i data-lucide="key-round" class="w-7 h-7 text-green-600"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-3">Implementación de SSO</h3>
+                <h3 class="text-xl font-bold mb-3"><?= t('servicio_3_title', 'home') ?></h3>
                 <p class="text-gray-600 mb-4">
-                    Single Sign-On para tu institución. Un solo login para profesores, estudiantes 
-                    y padres. Seguridad reforzada y experiencia de usuario simplificada.
+                    <?= t('servicio_3_desc', 'home') ?>
                 </p>
                 <div class="flex items-center text-primary-600 font-semibold text-sm">
-                    <span>Entregable: Acceso unificado y seguro</span>
+                    <span><?= t('servicio_3_entregable', 'home') ?></span>
                     <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
                 </div>
             </div>
@@ -472,13 +455,12 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
                 <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <i data-lucide="scissors" class="w-7 h-7 text-orange-600"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-3">Depuración y Limpieza de Datos</h3>
+                <h3 class="text-xl font-bold mb-3"><?= t('servicio_4_title', 'home') ?></h3>
                 <p class="text-gray-600 mb-4">
-                    Eliminación de registros duplicados, estandarización de formatos y creación de 
-                    fuente única de verdad para toda la institución.
+                    <?= t('servicio_4_desc', 'home') ?>
                 </p>
                 <div class="flex items-center text-primary-600 font-semibold text-sm">
-                    <span>Entregable: Base de datos única y limpia</span>
+                    <span><?= t('servicio_4_entregable', 'home') ?></span>
                     <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
                 </div>
             </div>
@@ -490,9 +472,9 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
 <section id="casos" class="py-24 bg-gray-900 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 scroll-reveal">
-            <span class="text-primary-400 font-semibold text-sm uppercase tracking-wider">Casos de Éxito</span>
+            <span class="text-primary-400 font-semibold text-sm uppercase tracking-wider"><?= t('casos_label', 'home') ?></span>
             <h2 class="text-4xl font-bold mt-4 mb-6">
-                Escuelas que Dejaron de Comprar<br>y Empezaron a <span class="text-primary-400">Optimizar</span>
+                <?= t('casos_h2_l1', 'home') ?><br><?= t('casos_h2_l2', 'home') ?>
             </h2>
         </div>
         
@@ -564,16 +546,15 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
     <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center scroll-reveal">
         <div class="inline-flex items-center px-4 py-2 bg-white/10 text-white rounded-full text-sm font-semibold mb-6 backdrop-blur-sm">
             <i data-lucide="gift" class="w-4 h-4 mr-2"></i>
-            Diagnóstico inicial sin costo
+            <?= t('diagnostico_badge', 'home') ?>
         </div>
         
         <h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">
-            ¿Cuánto Dinero Estás Tirando<br>en Software Redundante?
+            <?= t('diagnostico_h2', 'home') ?>
         </h2>
         
         <p class="text-xl text-primary-100 mb-12 max-w-2xl mx-auto">
-            En 30 minutos te mostramos duplicados, licencias innecesarias y oportunidades de integración 
-            en tu sistema actual. Sin compromiso, sin venta de software.
+            <?= t('diagnostico_desc', 'home') ?>
         </p>
         
        <form class="bg-white rounded-3xl p-8 shadow-2xl max-w-2xl mx-auto text-left" id="form-auditoria" method="POST">
@@ -585,51 +566,51 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
     
     <div class="grid md:grid-cols-2 gap-6 mb-6">
         <div>
-            <label class="block text-gray-700 font-semibold mb-2">Nombre completo</label>
+            <label class="block text-gray-700 font-semibold mb-2"><?= t('form_nombre', 'home') ?></label>
             <input type="text" name="nombre" required 
                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                   placeholder="Tu nombre">
+                   placeholder="<?= t('form_nombre_placeholder', 'home') ?>">
         </div>
         <div>
-            <label class="block text-gray-700 font-semibold mb-2">Correo institucional</label>
+            <label class="block text-gray-700 font-semibold mb-2"><?= t('form_email', 'home') ?></label>
             <input type="email" name="email" required 
                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                   placeholder="nombre@escuela.edu.co">
+                   placeholder="<?= t('form_email_placeholder', 'home') ?>">
         </div>
     </div>
     
     <div class="grid md:grid-cols-2 gap-6 mb-6">
         <div>
-            <label class="block text-gray-700 font-semibold mb-2">Nombre de la escuela</label>
+            <label class="block text-gray-700 font-semibold mb-2"><?= t('form_escuela', 'home') ?></label>
             <input type="text" name="escuela" 
                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                   placeholder="Institución Educativa...">
+                   placeholder="<?= t('form_escuela_placeholder', 'home') ?>">
         </div>
         <div>
-            <label class="block text-gray-700 font-semibold mb-2">Ciudad / País</label>
+            <label class="block text-gray-700 font-semibold mb-2"><?= t('form_ubicacion', 'home') ?></label>
             <input type="text" name="ubicacion" 
                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                   placeholder="Bogotá, Colombia">
+                   placeholder="<?= t('form_ubicacion_placeholder', 'home') ?>">
         </div>
     </div>
     
     <div class="mb-6">
-        <label class="block text-gray-700 font-semibold mb-2">¿Qué sistemas usan actualmente? (breve lista)</label>
+        <label class="block text-gray-700 font-semibold mb-2"><?= t('form_sistemas', 'home') ?></label>
         <textarea name="sistemas" rows="3" 
                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800"
-                  placeholder="Ej: Excel, Google Classroom, SGA X, plataforma de pagos Y..."></textarea>
+                  placeholder="<?= t('form_sistemas_placeholder', 'home') ?>"></textarea>
     </div>
     
     <div class="mb-6">
-        <label class="block text-gray-700 font-semibold mb-2">Principal dolor de cabeza con sus sistemas</label>
+        <label class="block text-gray-700 font-semibold mb-2"><?= t('form_problema', 'home') ?></label>
         <select name="problema" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800">
-            <option value="">Selecciona el problema principal</option>
-            <option value="duplicados">Datos duplicados en varios sistemas</option>
-            <option value="passwords">Muchas contraseñas para recordar</option>
-            <option value="costos">Costos de licencias muy altos</option>
-            <option value="desactualizado">Información desactualizada</option>
-            <option value="soporte">Muchos tickets de soporte</option>
-            <option value="otro">Otro (especificar en mensaje)</option>
+            <option value=""><?= t('form_problema_default', 'home') ?></option>
+            <option value="duplicados"><?= t('form_problema_duplicados', 'home') ?></option>
+            <option value="passwords"><?= t('form_problema_passwords', 'home') ?></option>
+            <option value="costos"><?= t('form_problema_costos', 'home') ?></option>
+            <option value="desactualizado"><?= t('form_problema_desactualizado', 'home') ?></option>
+            <option value="soporte"><?= t('form_problema_soporte', 'home') ?></option>
+            <option value="otro"><?= t('form_problema_otro', 'home') ?></option>
         </select>
     </div>
     
@@ -638,13 +619,13 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
     
     <button type="submit" id="submit-btn"
             class="w-full py-4 bg-gray-900 text-white rounded-xl font-bold text-lg hover:bg-gray-800 transition transform hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-        <span>Solicitar Auditoría Gratuita</span>
+        <span><?= t('form_submit', 'home') ?></span>
         <i data-lucide="arrow-right" class="w-5 h-5"></i>
     </button>
     
     <p class="text-sm text-gray-500 mt-4 text-center flex items-center justify-center gap-1">
         <i data-lucide="shield-check" class="w-4 h-4"></i>
-        No te venderemos software. Solo analizaremos tu infraestructura actual.
+        <?= t('form_privacy', 'home') ?>
     </p>
 </form>
 
@@ -667,7 +648,7 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
         
         if (!token) {
             e.preventDefault();
-            alert('Por favor completa la verificación de seguridad');
+            alert('<?= t('form_seguridad', 'home') ?>');
             return false;
         }
         
@@ -681,11 +662,11 @@ foreach (['hero', 'problema', 'metodologia', 'servicios', 'casos', 'contacto'] a
 
 <!-- Keywords semánticas ocultas -->
 <div class="sr-only" aria-hidden="true">
-    <p>Consultoría en sistemas educativos Colombia, auditoría de software escolar, 
+    <p>Consultoría en sistemas educativos Colombia, auditoría de plataformas escolares, 
     integración de aplicaciones educativas, SSO para escuelas, eliminación de duplicados 
     en bases de datos escolares, optimización de infraestructura TI educativa, 
     arquitectura de información educativa, consultoría tecnológica escuelas Latinoamérica,
-    unificación de sistemas escolares, reducción de costos de software educativo.</p>
+    unificación de sistemas escolares, reducción de costos de plataformas educativas.</p>
 </div>
 
 <script>
@@ -698,7 +679,7 @@ document.getElementById('form-auditoria').addEventListener('submit', async funct
     // Vérifier le token Turnstile
     const token = document.getElementById('cf-turnstile-response').value;
     if (!token) {
-        mostrarMensajeAuditoria('❌ Por favor completa la verificación de seguridad (Turnstile)', 'error');
+        mostrarMensajeAuditoria('❌ <?= t('form_seguridad', 'home') ?> (Turnstile)', 'error');
         return false;
     }
     
@@ -711,7 +692,7 @@ document.getElementById('form-auditoria').addEventListener('submit', async funct
     // UX sympa 😏
     button.disabled = true;
     const originalText = button.innerHTML;
-    button.innerHTML = "Enviando... ⏳";
+    button.innerHTML = "<?= t('form_enviando', 'home') ?> ⏳";
 
     try {
        const response = await fetch('procesar_contacto', {
@@ -727,7 +708,7 @@ document.getElementById('form-auditoria').addEventListener('submit', async funct
         const data = JSON.parse(text);
 
         if (data.exito) {
-            mostrarMensajeAuditoria("✅ Auditoría solicitada correctamente. Te contactamos pronto.", "success");
+            mostrarMensajeAuditoria("✅ <?= t('form_exito', 'home') ?>", "success");
             form.reset();
         } else {
             mostrarMensajeAuditoria("❌ " + data.errores.join('<br>'), "error");
@@ -735,7 +716,7 @@ document.getElementById('form-auditoria').addEventListener('submit', async funct
 
     } catch (error) {
         console.error(error);
-        mostrarMensajeAuditoria("❌ Error de conexión", "error");
+        mostrarMensajeAuditoria("❌ <?= t('form_error', 'home') ?>", "error");
     }
 
     button.disabled = false;

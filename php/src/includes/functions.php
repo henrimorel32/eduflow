@@ -1,6 +1,77 @@
 <?php
 declare(strict_types=1);
 
+// ============================================
+// I18N - Système de traduction
+// ============================================
+
+$translations = [];
+$currentLang = 'es';
+
+/**
+ * Charge le fichier de langue
+ */
+function loadLang(string $lang): void {
+    global $translations, $currentLang;
+    
+    $langs = ['es', 'en', 'fr'];
+    if (!in_array($lang, $langs, true)) {
+        $lang = 'es';
+    }
+    
+    $currentLang = $lang;
+    $file = I18N_PATH . '/' . $lang . '.php';
+    
+    if (file_exists($file)) {
+        $translations = require $file;
+    } else {
+        $translations = [];
+    }
+}
+
+/**
+ * Récupère une traduction (supporte les clés imbriquées avec .)
+ * Ex: t('title', 'seo.myschoolby') ou t('nav.home')
+ */
+function t(string $key, string $section = 'global'): string {
+    global $translations;
+    
+    $value = $translations;
+    
+    // Si section contient des points, on les ajoute aux clés
+    $keys = [];
+    if ($section !== 'global') {
+        $keys = array_merge(explode('.', $section), explode('.', $key));
+    } else {
+        $keys = explode('.', $key);
+    }
+    
+    foreach ($keys as $k) {
+        if (is_array($value) && array_key_exists($k, $value)) {
+            $value = $value[$k];
+        } else {
+            return $key; // Fallback: retourne la clé
+        }
+    }
+    
+    return is_string($value) ? $value : $key;
+}
+
+/**
+ * Retourne la langue courante
+ */
+function getLang(): string {
+    global $currentLang;
+    return $currentLang;
+}
+
+/**
+ * Détecte si l'utilisateur est sur le marché colombien
+ * Basé sur la langue : ES = Colombie, EN/FR = international
+ */
+function isColombianMarket(): bool {
+    return getLang() === 'es';
+}
 
 /**
  * Échappe HTML (définie en PREMIER)
@@ -10,11 +81,26 @@ function e(string $text): string {
 }
 
 /**
- * Génère une URL propre
+ * Génère une URL propre (avec support langue)
  */
 function url(string $page = 'home'): string {
-    if ($page === 'home') return '/';
-    return '/' . $page;
+    global $currentLang;
+    
+    $prefix = ($currentLang !== 'es') ? '/' . $currentLang : '';
+    if ($page === 'home') return $prefix . '/';
+    return $prefix . '/' . $page;
+}
+
+/**
+ * Génère l'URL canonique pour une langue donnée
+ */
+function urlLang(string $page = 'home', string $lang = ''): string {
+    global $currentLang;
+    
+    if (empty($lang)) $lang = $currentLang;
+    $prefix = ($lang !== 'es') ? '/' . $lang : '';
+    if ($page === 'home') return 'https://hm-edu.co' . $prefix . '/';
+    return 'https://hm-edu.co' . $prefix . '/' . $page;
 }
 
 /**
@@ -87,98 +173,70 @@ function activeIndicator(string $pageName): string {
 }
 
 /**
- * SEO - Données par page (AVEC TOUTES LES CLÉS GLOBALES)
+ * Accède directement aux traductions (pour tableaux)
  */
-function getSeoData(string $page): array {
-    // DONNÉES GLOBALES (communes à toutes les pages)
-    $global = [
-        'site_name' => 'HM - Transformación Digital Educativa',
-        'site_url' => 'https://hm-edu.co',  // CLÉ MANQUANTE AJOUTÉE
-        'twitter' => '@hm_edu',              // CLÉ MANQUANTE AJOUTÉE
-        'favicon' => '/favicon.ico',
-        'logo' => '/logo.png',
-        'brand' => 'HM',
-    ];
-
-    // DONNÉES PAR PAGE
-    $pages = [
-        'home' => [
-            'title' => 'Software para Colegios Colombia | Sistema de Gestión Escolar Integral',
-            'description' => 'Digitaliza tu institución con el sistema escuela más completo. Software para colegios que integra matrículas, académico y administración.',
-            'keywords' => 'software colegio, software escuela, sistema escuela, plataforma educativa, gestión escolar digital',
-            'h1' => 'Software para Colegios: Digitaliza tu Gestión Educativa',
-            'canonical' => '/',
-            'og_image' => '/og-home.jpg',
-            'schema_type' => 'Organization',
-            'cta_nav' => 'Diagnóstico Gratis',
-        ],
-        
-        'soluciones' => [
-            'title' => 'Sistema Escuela Integral | Software Gestión Educativa Colombia',
-            'description' => 'Descubre todas las funcionalidades de nuestro sistema escuela completo.',
-            'keywords' => 'sistema escuela, software colegio funcionalidades, plataforma educativa',
-            'h1' => 'Sistema Escuela Completo para tu Institución',
-            'canonical' => '/soluciones',
-            'og_image' => '/og-soluciones.jpg',
-            'schema_type' => 'Product',
-            'cta_nav' => 'Ver Soluciones',
-        ],
-        
-        'icfes' => [
-            'title' => 'Preparación ICFES con IA | Sistema Inteligente',
-            'description' => 'Entrena para el ICFES con inteligencia artificial adaptativa.',
-            'keywords' => 'preparación ICFES, simulacros ICFES, entrenamiento ICFES',
-            'h1' => 'Sistema Inteligente de Preparación para el ICFES',
-            'canonical' => '/icfes',
-            'og_image' => '/og-icfes.jpg',
-            'schema_type' => 'Product',
-            'cta_nav' => 'Entrenar ICFES',
-        ],
-        
-        'contacto' => [
-            'title' => 'Contacto | Software Colegio Colombia - HM',
-            'description' => 'Solicita tu diagnóstico gratuito de sistema escuela.',
-            'keywords' => 'contacto software colegio, demo sistema escuela',
-            'h1' => 'Hablemos de tu Transformación Digital',
-            'canonical' => '/contacto',
-            'og_image' => '/og-contacto.jpg',
-            'schema_type' => 'ContactPage',
-            'cta_nav' => 'Agendar Demo',
-        ],
-        
-        'aplicaciones' => [
-            'title' => 'Nuestras Aplicaciones Educativas | ICFES, Saber, Saber PRO y más - HM',
-            'description' => 'Descubre nuestras plataformas de preparación para exámenes en Colombia: ICFES, Pruebas Saber, Quiero Ser Quiero Saber, Saber PRO y Concurso Docente.',
-            'keywords' => 'aplicaciones educativas Colombia, preparación ICFES, pruebas Saber, Saber PRO, concurso docente, orientación vocacional',
-            'h1' => 'Nuestras Creaciones y Aplicaciones Educativas',
-            'canonical' => '/aplicaciones',
-            'og_image' => '/og-aplicaciones.jpg',
-            'schema_type' => 'Product',
-            'cta_nav' => 'Ver Aplicaciones',
-        ],
-        
-        'saberpro' => [
-            'title' => 'Preparación Saber PRO Colombia | Simulacros y Entrenamiento Inteligente — Mente Viva',
-            'description' => 'La plataforma #1 para preparar el Saber PRO en Colombia. Simulacros reales, retroalimentación inmediata y reporte de competencias genéricas y específicas. Prueba gratis sin registro.',
-            'keywords' => 'preparación Saber PRO, simulacros Saber PRO, pruebas Saber PRO Colombia, examen Saber PRO, puntaje Saber PRO, competencias genéricas Saber PRO, competencias específicas Saber PRO, cómo aprobar Saber PRO, preparar Saber PRO en línea, plataforma Saber PRO Colombia',
-            'h1' => 'Preparación Saber PRO Colombia: Simulacros Reales y Entrenamiento Inteligente',
-            'canonical' => '/saberpro',
-            'og_image' => '/og-saberpro.jpg',
-            'schema_type' => 'Product',
-            'cta_nav' => 'Preparar Saber PRO',
-        ],
-    ];
-
-    // Fusion: global + page spécifique
-    $pageData = $pages[$page] ?? $pages['home'];
+function tRaw(string $key, string $section = 'global') {
+    global $translations;
     
-    return array_merge($global, $pageData);
+    $value = $translations;
+    $keys = [];
+    if ($section !== 'global') {
+        $keys = array_merge(explode('.', $section), explode('.', $key));
+    } else {
+        $keys = explode('.', $key);
+    }
+    
+    foreach ($keys as $k) {
+        if (is_array($value) && array_key_exists($k, $value)) {
+            $value = $value[$k];
+        } else {
+            return null;
+        }
+    }
+    
+    return $value;
 }
 
 /**
- * Génère le Schema.org JSON-LD
+ * SEO - Données par page (multilingue via fichiers i18n)
+ */
+function getSeoData(string $page): array {
+    $lang = getLang();
+    
+    // DONNÉES GLOBALES
+    $global = [
+        'site_name' => t('site_name', 'seo'),
+        'site_url' => t('site_url', 'seo'),
+        'twitter' => t('twitter', 'seo'),
+        'favicon' => '/favicon.ico',
+        'logo' => '/logo.png',
+        'brand' => t('brand', 'seo'),
+        'lang' => $lang,
+    ];
+    
+    // Données SEO depuis les traductions (accès direct pour récupérer le tableau)
+    $pageSeo = tRaw($page, 'seo');
+    if (!is_array($pageSeo)) {
+        $pageSeo = tRaw('home', 'seo') ?? [];
+    }
+    
+    // Ajuster le canonical avec le préfixe langue
+    $pageSeo['canonical'] = url($page === 'home' ? 'home' : $page);
+    
+    return array_merge($global, $pageSeo);
+}
+
+/**
+ * Génère le Schema.org JSON-LD (multilingue)
  */
 function generateSchema(array $seo, string $page): string {
+    $lang = getLang();
+    $descriptions = [
+        'es' => 'Software líder para gestión digital de colegios en Colombia y el mundo',
+        'en' => 'Leading software for digital school management in Colombia and worldwide',
+        'fr' => 'Logiciel leader pour la gestion digitale des écoles en Colombie et dans le monde',
+    ];
+    
     $schemas = [
         'Organization' => [
             '@context' => 'https://schema.org',
@@ -186,12 +244,12 @@ function generateSchema(array $seo, string $page): string {
             'name' => $seo['site_name'] ?? 'HM',
             'url' => $seo['site_url'] ?? 'https://hm-edu.co',
             'logo' => ($seo['site_url'] ?? 'https://hm-edu.co') . ($seo['logo'] ?? '/logo.png'),
-            'description' => 'Software líder para gestión digital de colegios en Colombia',
+            'description' => $descriptions[$lang] ?? $descriptions['es'],
             'contactPoint' => [
                 '@type' => 'ContactPoint',
-                'telephone' => '+57-320-418-1193',
                 'contactType' => 'sales',
-            ],
+                'availableLanguage' => ['Spanish', 'English', 'French'],
+            ] + (isColombianMarket() ? ['telephone' => '+57-320-418-1193'] : []),
         ],
         
         'Product' => [
@@ -211,11 +269,11 @@ function generateSchema(array $seo, string $page): string {
             '@context' => 'https://schema.org',
             '@type' => 'ContactPage',
             'name' => $seo['title'] ?? 'Contacto',
-            'mainEntity' => [
+            'mainEntity' => array_filter([
                 '@type' => 'Organization',
                 'name' => 'HM',
-                'telephone' => '+57-320-418-1193',
-            ],
+                'telephone' => isColombianMarket() ? '+57-320-418-1193' : null,
+            ]),
         ],
     ];
 
