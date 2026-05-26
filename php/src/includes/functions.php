@@ -104,6 +104,19 @@ function urlLang(string $page = 'home', string $lang = ''): string {
 }
 
 /**
+ * Génère l'URL pour changer de langue (en conservant la page courante)
+ */
+function switchLangUrl(string $targetLang): string {
+    $page = $_GET['page'] ?? 'home';
+    $prefix = ($targetLang !== 'es') ? '/' . $targetLang : '';
+    $url = $prefix . ($page === 'home' ? '/' : '/' . $page);
+    if ($targetLang === 'es') {
+        $url .= '?lang=es';
+    }
+    return $url;
+}
+
+/**
  * Génère un badge pulsant
  */
 function pulseBadge(string $text, string $color = 'primary'): string {

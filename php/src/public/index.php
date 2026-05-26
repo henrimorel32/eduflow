@@ -10,26 +10,68 @@ define('I18N_PATH', ROOT_PATH . '/i18n');
 define('ASSETS_URL', '/assets');
 
 // =====================================================
-// DETECTION LANGUE
+// LANGUES SUPPORTÉES
 // =====================================================
 
 $langs = ['es', 'en', 'fr'];
-$lang = 'en'; // default = anglais (marché mondial)
 
-// Priorité 1: paramètre GET ?lang=xx
+// =====================================================
+// RÉSOLUTION URL (extrait page + préfixe langue potentiel)
+// =====================================================
+
+$page = 'home';
+$rawPath = '';
+$langFromUrl = null;
+
+if (!empty($_GET['page'])) {
+    $rawPath = trim($_GET['page'], '/');
+} elseif (!empty($_SERVER['PATH_INFO'])) {
+    $rawPath = trim($_SERVER['PATH_INFO'], '/');
+} elseif (!empty($_SERVER['REQUEST_URI'])) {
+    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $uri = trim($uri, '/');
+    $uri = preg_replace('#^public/#', '', $uri);
+    $uri = preg_replace('/\.php$/', '', $uri);
+    $uri = preg_replace('#^index\.php/?#', '', $uri);
+    $rawPath = $uri;
+}
+
+if (!empty($rawPath)) {
+    $parts = explode('/', $rawPath);
+    if (in_array($parts[0], $langs, true)) {
+        $langFromUrl = $parts[0];
+        array_shift($parts);
+        $page = implode('/', $parts);
+    } else {
+        $page = $rawPath;
+    }
+}
+
+$page = $page ?: 'home';
+
+// =====================================================
+// DÉTECTION LANGUE
+// Priorité: GET ?lang=xx > Préfixe URL > Session (choix explicite) > Navigateur > Défaut ES
+// =====================================================
+
 if (!empty($_GET['lang']) && in_array($_GET['lang'], $langs, true)) {
+    // Priorité 1: paramètre GET explicite (clic sur le sélecteur)
     $lang = $_GET['lang'];
     $_SESSION['lang'] = $lang;
-}
-// Priorité 2: session
-elseif (!empty($_SESSION['lang']) && in_array($_SESSION['lang'], $langs, true)) {
+    $_SESSION['lang_chosen'] = true;
+} elseif ($langFromUrl !== null) {
+    // Priorité 2: préfixe URL (/en/page, /fr/page)
+    $lang = $langFromUrl;
+    $_SESSION['lang'] = $lang;
+    $_SESSION['lang_chosen'] = true;
+} elseif (!empty($_SESSION['lang_chosen']) && !empty($_SESSION['lang']) && in_array($_SESSION['lang'], $langs, true)) {
+    // Priorité 3: l'utilisateur a déjà choisi une langue explicitement
     $lang = $_SESSION['lang'];
-}
-// Priorité 3: langue du navigateur (fallback EN si non supportée)
-else {
+} else {
+    // Priorité 4: détection navigateur (pas de choix explicite encore)
+    $lang = 'es';
     $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
     if (!empty($acceptLang)) {
-        // Parse les langues acceptées (ex: fr-FR,fr;q=0.9,en-US;q=0.8)
         preg_match_all('/([a-z]{1,8}(?:-[a-z]{1,8})?)\s*(?:;q=([0-9.]+))?/', strtolower($acceptLang), $matches);
         $browserLangs = [];
         foreach ($matches[1] as $i => $code) {
@@ -37,7 +79,6 @@ else {
             $browserLangs[$code] = $q;
         }
         arsort($browserLangs);
-        
         foreach (array_keys($browserLangs) as $code) {
             $base = substr($code, 0, 2);
             if (in_array($base, $langs, true)) {
@@ -50,54 +91,33 @@ else {
 }
 
 // =====================================================
-// RESOLUTION URL (avec support préfixe langue /en/page)
+// REDIRECTION PROPRE (si ?lang=xx ne correspond pas à l'URL)
 // =====================================================
-
-$page = 'home';
-$rawPath = '';
-
-// Priorité 1: paramètre GET
-if (!empty($_GET['page'])) {
-    $rawPath = trim($_GET['page'], '/');
-}
-// Priorité 2: PATH_INFO
-elseif (!empty($_SERVER['PATH_INFO'])) {
-    $rawPath = trim($_SERVER['PATH_INFO'], '/');
-}
-// Priorité 3: REQUEST_URI
-elseif (!empty($_SERVER['REQUEST_URI'])) {
-    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $uri = trim($uri, '/');
-    $uri = preg_replace('#^public/#', '', $uri);
-    $uri = preg_replace('/\.php$/', '', $uri);
-    $uri = preg_replace('#^index\.php/?#', '', $uri);
-    $rawPath = $uri;
-}
-
-// Extraction du préfixe de langue (/en/page -> lang=en, page=page)
-if (!empty($rawPath)) {
-    $parts = explode('/', $rawPath);
-    if (in_array($parts[0], $langs, true)) {
-        $lang = $parts[0];
-        $_SESSION['lang'] = $lang;
-        array_shift($parts);
-        $page = implode('/', $parts);
-    } else {
-        $page = $rawPath;
+if (!empty($_GET['lang']) && in_array($_GET['lang'], $langs, true)) {
+    $needsRedirect = false;
+    if ($langFromUrl === null && $_GET['lang'] !== 'es') {
+        // /contacto?lang=fr  →  doit rediriger vers /fr/contacto
+        $needsRedirect = true;
+    } elseif ($langFromUrl !== null && $_GET['lang'] !== $langFromUrl) {
+        // /fr/contacto?lang=en  →  doit rediriger vers /en/contacto
+        $needsRedirect = true;
+    }
+    if ($needsRedirect) {
+        $targetPrefix = ($_GET['lang'] !== 'es') ? '/' . $_GET['lang'] : '';
+        $targetUrl = $targetPrefix . ($page === 'home' ? '/' : '/' . $page);
+        header('Location: ' . $targetUrl, true, 302);
+        exit;
     }
 }
 
-// Si pas de page après le langue, home
-$page = $page ?: 'home';
-
 // =====================================================
-// SECURITE
+// SÉCURITÉ
 // =====================================================
 
 $page = preg_replace('/[^a-z0-9_-]/i', '', $page);
 $page = $page ?: 'home';
 
-$allowed = ['home', 'soluciones', 'contacto', 'icfes', 'aplicaciones', 'saberpro', 'procesar_contacto','inscripcion','suscripcion','check_nombre','check_disponibilidad','myschoolby'];
+$allowed = ['home', 'soluciones', 'contacto', 'icfes', 'aplicaciones', 'saberpro', 'realisaciones', 'procesar_contacto','inscripcion','suscripcion','check_nombre','check_disponibilidad','myschoolby'];
 if (!in_array($page, $allowed, true)) {
     $page = 'home';
 }

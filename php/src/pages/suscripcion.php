@@ -67,7 +67,7 @@ if (!isset($idiomas[$idioma_actual])) $idioma_actual = 'es';
 $_SESSION['lang'] = $idioma_actual;
 
 // Fonction de traduction
-function t(string $clave, string $seccion = 'suscripcion'): string {
+function t_suscripcion(string $clave, string $seccion = 'suscripcion'): string {
     global $idioma_actual, $pdo;
     
     try {
@@ -103,15 +103,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Validations
     if (empty($nombre_escuela)) {
-        $errores[] = t('campo_obligatorio') . ': ' . t('label_nombre_escuela');
+        $errores[] = t_suscripcion('campo_obligatorio') . ': ' . t_suscripcion('label_nombre_escuela');
     }
     
     if (empty($nombre_director)) {
-        $errores[] = t('campo_obligatorio') . ': ' . t('label_nombre_director');
+        $errores[] = t_suscripcion('campo_obligatorio') . ': ' . t_suscripcion('label_nombre_director');
     }
     
     if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errores[] = t('email_invalido');
+        $errores[] = t_suscripcion('email_invalido');
     }
     
     // Vérifier si le nom existe déjà
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("SELECT id FROM suscripciones_escuelas WHERE slug = ? OR nombre_escuela = ?");
             $stmt->execute([$slug, $nombre_escuela]);
             if ($stmt->fetch()) {
-                $errores[] = t('nombre_no_disponible');
+                $errores[] = t_suscripcion('nombre_no_disponible');
             }
         } catch (PDOException $e) {
             error_log("Erreur vérification nom: " . $e->getMessage());
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("SELECT id FROM suscripciones_escuelas WHERE email = ?");
             $stmt->execute([$email]);
             if ($stmt->fetch()) {
-                $errores[] = t('email_no_disponible');
+                $errores[] = t_suscripcion('email_no_disponible');
             }
         } catch (PDOException $e) {
             error_log("Erreur vérification email: " . $e->getMessage());
@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Le logo est optionnel - on affiche un warning mais on continue
             $errors = $storage->getErrors();
             error_log("Logo upload warning: " . implode(', ', $errors));
-            $logo_warning = t('error_cargar_logo') . " (" . implode(', ', $errors) . ")";
+            $logo_warning = t_suscripcion('error_cargar_logo') . " (" . implode(', ', $errors) . ")";
             // On ne bloque pas l'inscription pour une erreur de logo
         }
     } else {
@@ -678,10 +678,10 @@ $paises_america = [
                     <i class="fas fa-check text-4xl text-green-500"></i>
                 </div>
                 
-                <h1 class="text-2xl font-bold text-gray-800 mb-4"><?= t('exito_titulo') ?></h1>
+                <h1 class="text-2xl font-bold text-gray-800 mb-4"><?= t_suscripcion('exito_titulo') ?></h1>
                 
                 <p class="text-gray-600 mb-6">
-                    <?= t('exito_mensaje') ?><br>
+                    <?= t_suscripcion('exito_mensaje') ?><br>
                     <strong class="text-purple-600 text-lg"><?= date('d/m/Y', strtotime($datos['fecha_fin'])) ?></strong>
                 </p>
                 
@@ -695,7 +695,7 @@ $paises_america = [
                 
                 <a href="https://<?= $datos['subdomain'] ?>" 
                    class="inline-block bg-gradient-to-r from-purple-600 to-blue-500 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all transform hover:-translate-y-1">
-                    <?= t('ir_a_pagina') ?> <i class="fas fa-arrow-right ml-2"></i>
+                    <?= t_suscripcion('ir_a_pagina') ?> <i class="fas fa-arrow-right ml-2"></i>
                 </a>
                 
                 <p class="text-xs text-gray-400 mt-6">
@@ -714,10 +714,10 @@ $paises_america = [
                     🎁 30 días gratis
                 </span>
                 <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-                    <?= t('titulo_principal') ?>
+                    <?= t_suscripcion('titulo_principal') ?>
                 </h1>
                 <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                    <?= t('subtitulo') ?>
+                    <?= t_suscripcion('subtitulo') ?>
                 </p>
             </div>
             
@@ -726,7 +726,7 @@ $paises_america = [
                 <div class="flex items-start">
                     <i class="fas fa-info-circle text-blue-500 text-xl mr-3 mt-1"></i>
                     <p class="text-blue-800">
-                        <?= t('explicacion') ?>
+                        <?= t_suscripcion('explicacion') ?>
                     </p>
                 </div>
             </div>
@@ -776,11 +776,11 @@ $paises_america = [
                         <!-- Nom de l'école -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <?= t('label_nombre_escuela') ?> *
+                                <?= t_suscripcion('label_nombre_escuela') ?> *
                             </label>
                             <input type="text" name="nombre_escuela" id="nombre_escuela" required
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                   placeholder="<?= t('placeholder_nombre') ?>"
+                                   placeholder="<?= t_suscripcion('placeholder_nombre') ?>"
                                    value="<?= htmlspecialchars($_POST['nombre_escuela'] ?? '') ?>">
                             <div id="availability-status" class="mt-2 text-sm min-h-[24px]"></div>
                         </div>
@@ -788,7 +788,7 @@ $paises_america = [
                         <!-- Nom du directeur -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <?= t('label_nombre_director') ?> *
+                                <?= t_suscripcion('label_nombre_director') ?> *
                             </label>
                             <input type="text" name="nombre_director" required
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
@@ -798,7 +798,7 @@ $paises_america = [
                         <!-- Email -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <?= t('label_email') ?> *
+                                <?= t_suscripcion('label_email') ?> *
                             </label>
                             <input type="email" name="email" id="email" required
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
@@ -809,7 +809,7 @@ $paises_america = [
                         <!-- Téléphone -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <?= t('label_telefono') ?>
+                                <?= t_suscripcion('label_telefono') ?>
                             </label>
                             <input type="tel" name="telefono"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
@@ -820,7 +820,7 @@ $paises_america = [
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <?= t('label_ciudad') ?>
+                                    <?= t_suscripcion('label_ciudad') ?>
                                 </label>
                                 <input type="text" name="ciudad"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
@@ -828,7 +828,7 @@ $paises_america = [
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <?= t('label_pais') ?>
+                                    <?= t_suscripcion('label_pais') ?>
                                 </label>
                                 <select name="pais" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
                                     <?php foreach ($paises_america as $codigo => $nombres): ?>
@@ -843,7 +843,7 @@ $paises_america = [
                         <!-- Logo -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <?= t('label_logo') ?>
+                                <?= t_suscripcion('label_logo') ?>
                             </label>
                             <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-purple-500 transition-colors cursor-pointer" onclick="document.getElementById('logo').click()">
                                 <div class="space-y-1 text-center">
@@ -857,7 +857,7 @@ $paises_america = [
                                     <p class="text-xs text-gray-500">PNG, JPG hasta 2MB</p>
                                 </div>
                             </div>
-                            <p class="mt-2 text-sm text-gray-500"><?= t('ayuda_logo') ?></p>
+                            <p class="mt-2 text-sm text-gray-500"><?= t_suscripcion('ayuda_logo') ?></p>
                             <div id="logo-preview" class="mt-4 hidden">
                                 <img src="" alt="Logo preview" class="h-24 object-contain rounded-lg border border-gray-200">
                             </div>
@@ -867,7 +867,7 @@ $paises_america = [
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <?= t('label_color_primario') ?>
+                                    <?= t_suscripcion('label_color_primario') ?>
                                 </label>
                                 <div class="flex items-center space-x-3">
                                     <div class="color-picker-wrapper w-12 h-12 rounded-lg shadow-sm border border-gray-300" style="background-color: #2563eb;">
@@ -880,7 +880,7 @@ $paises_america = [
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <?= t('label_color_secundario') ?>
+                                    <?= t_suscripcion('label_color_secundario') ?>
                                 </label>
                                 <div class="flex items-center space-x-3">
                                     <div class="color-picker-wrapper w-12 h-12 rounded-lg shadow-sm border border-gray-300" style="background-color: #06b6d4;">
@@ -910,7 +910,7 @@ $paises_america = [
                                 class="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center <?= $isDev ? '' : 'opacity-50 cursor-not-allowed' ?>"
                                 <?= $isDev ? '' : 'disabled' ?>>
                             <i class="fas fa-magic mr-2"></i>
-                            <?= t('boton_crear') ?>
+                            <?= t_suscripcion('boton_crear') ?>
                         </button>
                         
                     </form>
@@ -921,7 +921,7 @@ $paises_america = [
                     <div class="bg-white rounded-2xl shadow-lg p-8 sticky top-8">
                         <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                             <i class="fas fa-eye text-purple-600 mr-3"></i>
-                            <?= t('preview_titulo') ?>
+                            <?= t_suscripcion('preview_titulo') ?>
                         </h2>
                         
                         <!-- Aperçu du formulaire -->
@@ -968,11 +968,11 @@ $paises_america = [
                         <div class="mt-6 space-y-3">
                             <div class="flex items-center text-sm text-gray-600">
                                 <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                                <?= t('info_trial') ?>
+                                <?= t_suscripcion('info_trial') ?>
                             </div>
                             <div class="flex items-center text-sm text-gray-600">
                                 <i class="fas fa-shield-alt text-green-500 mr-3"></i>
-                                <?= t('info_seguro') ?>
+                                <?= t_suscripcion('info_seguro') ?>
                             </div>
                             <div class="flex items-center text-sm text-gray-600">
                                 <i class="fas fa-paint-brush text-purple-500 mr-3"></i>
@@ -1004,30 +1004,30 @@ $paises_america = [
                 </div>
             </div>
             
-            <h2 class="text-2xl font-bold text-gray-800 mb-2"><?= t('loading_titre') ?></h2>
-            <p class="text-gray-600 mb-6"><?= t('loading_sous_titre') ?></p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2"><?= t_suscripcion('loading_titre') ?></h2>
+            <p class="text-gray-600 mb-6"><?= t_suscripcion('loading_sous_titre') ?></p>
             
             <!-- Étapes -->
             <div class="space-y-3 text-left">
                 <div id="step-1" class="flex items-center space-x-3 text-gray-400">
                     <i class="fas fa-circle text-xs"></i>
-                    <span class="text-sm"><?= t('loading_step_1') ?></span>
+                    <span class="text-sm"><?= t_suscripcion('loading_step_1') ?></span>
                 </div>
                 <div id="step-2" class="flex items-center space-x-3 text-gray-400">
                     <i class="fas fa-circle text-xs"></i>
-                    <span class="text-sm"><?= t('loading_step_2') ?></span>
+                    <span class="text-sm"><?= t_suscripcion('loading_step_2') ?></span>
                 </div>
                 <div id="step-3" class="flex items-center space-x-3 text-gray-400">
                     <i class="fas fa-circle text-xs"></i>
-                    <span class="text-sm"><?= t('loading_step_3') ?></span>
+                    <span class="text-sm"><?= t_suscripcion('loading_step_3') ?></span>
                 </div>
                 <div id="step-4" class="flex items-center space-x-3 text-gray-400">
                     <i class="fas fa-circle text-xs"></i>
-                    <span class="text-sm"><?= t('loading_step_4') ?></span>
+                    <span class="text-sm"><?= t_suscripcion('loading_step_4') ?></span>
                 </div>
                 <div id="step-5" class="flex items-center space-x-3 text-gray-400">
                     <i class="fas fa-circle text-xs"></i>
-                    <span class="text-sm"><?= t('loading_step_5') ?></span>
+                    <span class="text-sm"><?= t_suscripcion('loading_step_5') ?></span>
                 </div>
             </div>
             
@@ -1035,24 +1035,24 @@ $paises_america = [
             <div class="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
                 <div class="flex items-center justify-center space-x-2 mb-2">
                     <i class="fas fa-shield-alt text-green-600"></i>
-                    <span class="font-semibold text-green-800"><?= t('loading_securite_titre') ?></span>
+                    <span class="font-semibold text-green-800"><?= t_suscripcion('loading_securite_titre') ?></span>
                 </div>
                 <div class="grid grid-cols-2 gap-2 text-xs text-green-700">
                     <div class="flex items-center justify-center space-x-1">
                         <i class="fas fa-lock"></i>
-                        <span><?= t('loading_https') ?></span>
+                        <span><?= t_suscripcion('loading_https') ?></span>
                     </div>
                     <div class="flex items-center justify-center space-x-1">
                         <i class="fas fa-server"></i>
-                        <span><?= t('loading_cloud') ?></span>
+                        <span><?= t_suscripcion('loading_cloud') ?></span>
                     </div>
                     <div class="flex items-center justify-center space-x-1">
                         <i class="fas fa-database"></i>
-                        <span><?= t('loading_bd') ?></span>
+                        <span><?= t_suscripcion('loading_bd') ?></span>
                     </div>
                     <div class="flex items-center justify-center space-x-1">
                         <i class="fas fa-envelope"></i>
-                        <span><?= t('loading_email') ?></span>
+                        <span><?= t_suscripcion('loading_email') ?></span>
                     </div>
                 </div>
             </div>
@@ -1144,7 +1144,7 @@ $paises_america = [
                 return;
             }
             
-            nombreStatusDiv.innerHTML = '<span class="text-gray-500 availability-checking"><i class="fas fa-spinner fa-spin mr-2"></i><?= t('verificando_disponibilidad') ?></span>';
+            nombreStatusDiv.innerHTML = '<span class="text-gray-500 availability-checking"><i class="fas fa-spinner fa-spin mr-2"></i><?= t_suscripcion('verificando_disponibilidad') ?></span>';
             
             checkNombreTimeout = setTimeout(() => {
                 fetch(`/check_disponibilidad?nombre=${encodeURIComponent(nombre)}&email=`)
@@ -1154,10 +1154,10 @@ $paises_america = [
                         
                         if (hasError) {
                             disponibilidadNombreOk = false;
-                            nombreStatusDiv.innerHTML = '<span class="text-red-600"><i class="fas fa-times-circle mr-2"></i><?= t('nombre_no_disponible') ?></span>';
+                            nombreStatusDiv.innerHTML = '<span class="text-red-600"><i class="fas fa-times-circle mr-2"></i><?= t_suscripcion('nombre_no_disponible') ?></span>';
                         } else {
                             disponibilidadNombreOk = true;
-                            nombreStatusDiv.innerHTML = '<span class="text-green-600"><i class="fas fa-check-circle mr-2"></i><?= t('nombre_disponible') ?></span>';
+                            nombreStatusDiv.innerHTML = '<span class="text-green-600"><i class="fas fa-check-circle mr-2"></i><?= t_suscripcion('nombre_disponible') ?></span>';
                         }
                         updateSubmitButton();
                     })
@@ -1181,7 +1181,7 @@ $paises_america = [
                 return;
             }
             
-            emailStatusDiv.innerHTML = '<span class="text-gray-500 availability-checking"><i class="fas fa-spinner fa-spin mr-2"></i><?= t('verificando_disponibilidad') ?></span>';
+            emailStatusDiv.innerHTML = '<span class="text-gray-500 availability-checking"><i class="fas fa-spinner fa-spin mr-2"></i><?= t_suscripcion('verificando_disponibilidad') ?></span>';
             
             checkEmailTimeout = setTimeout(() => {
                 fetch(`/check_disponibilidad?nombre=&email=${encodeURIComponent(email)}`)
@@ -1191,7 +1191,7 @@ $paises_america = [
                         
                         if (hasError) {
                             disponibilidadEmailOk = false;
-                            emailStatusDiv.innerHTML = '<span class="text-red-600"><i class="fas fa-times-circle mr-2"></i><?= t('email_no_disponible') ?></span>';
+                            emailStatusDiv.innerHTML = '<span class="text-red-600"><i class="fas fa-times-circle mr-2"></i><?= t_suscripcion('email_no_disponible') ?></span>';
                         } else {
                             disponibilidadEmailOk = true;
                             emailStatusDiv.innerHTML = '<span class="text-green-600"><i class="fas fa-check-circle mr-2"></i>Email disponible</span>';
@@ -1253,7 +1253,7 @@ $paises_america = [
                 verificarDisponibilidad(true);
                 setTimeout(() => {
                     if (!disponibilidadNombreOk || !disponibilidadEmailOk) {
-                        alert('<?= t('verificar_antes_continuar') ?>');
+                        alert('<?= t_suscripcion('verificar_antes_continuar') ?>');
                     }
                 }, 600);
                 return;
@@ -1298,7 +1298,7 @@ $paises_america = [
                 alert('Por favor completa la verificación de seguridad (Turnstile)');
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-magic mr-2"></i><?= t('boton_crear') ?>';
+                    submitBtn.innerHTML = '<i class="fas fa-magic mr-2"></i><?= t_suscripcion('boton_crear') ?>';
                 }
                 return false;
             }
@@ -1327,7 +1327,7 @@ $paises_america = [
                 alert('Error al crear la página. Por favor intenta de nuevo.');
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-magic mr-2"></i><?= t('boton_crear') ?>';
+                    submitBtn.innerHTML = '<i class="fas fa-magic mr-2"></i><?= t_suscripcion('boton_crear') ?>';
                 }
             });
         });

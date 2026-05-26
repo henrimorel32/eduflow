@@ -55,8 +55,15 @@ $exito = false;
                         </div>
                         <div>
                             <h3 class="font-bold text-gray-900"><?= t('ubicacion', 'contacto') ?></h3>
-                            <p class="text-gray-600">Pereira, Colombia</p>
-                            <p class="text-sm text-gray-500"><?= t('atencion_nacional', 'contacto') ?></p>
+                            <div class="space-y-1 mt-1">
+                                <p class="text-gray-600 flex items-center gap-2">
+                                    <span class="text-lg">🇨🇴</span> Pereira, Colombia
+                                </p>
+                                <p class="text-gray-600 flex items-center gap-2">
+                                    <span class="text-lg">🇫🇷</span> Sainte-Gemme, 32120 France
+                                </p>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2"><?= t('atencion_nacional', 'contacto') ?></p>
                         </div>
                     </div>
                 </div>
